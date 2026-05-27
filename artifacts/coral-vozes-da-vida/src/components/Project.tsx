@@ -33,7 +33,7 @@ export function Project() {
         </motion.div>
 
         <div className="mt-20">
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Impacto nos Dois Primeiros Anos</h3>
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Realizações do Projeto</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {stats.map((stat, i) => (
               <motion.div
