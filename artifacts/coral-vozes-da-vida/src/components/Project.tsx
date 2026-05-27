@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Eye, Instagram, Mic2, Music2 } from 'lucide-react';
+import maestroImg from '@assets/4308f622-bd07-489e-aa6c-20a9812da31f_1779882739722.jpeg';
 
 export function Project() {
   const stats = [
@@ -40,16 +41,24 @@ export function Project() {
           transition={{ duration: 0.6 }}
           className="mt-16 max-w-2xl mx-auto"
         >
-          <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-8 md:p-10 text-white text-center overflow-hidden shadow-xl">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-            <div className="relative z-10">
-              <div className="w-16 h-16 rounded-full bg-accent/20 border-2 border-accent/40 flex items-center justify-center mx-auto mb-5">
-                <Music2 size={30} className="text-accent" />
-              </div>
-              <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Nosso Maestro Idealizador</p>
-              <h3 className="text-3xl md:text-4xl font-bold mb-3">Luciano Calazans</h3>
-              <div className="w-12 h-0.5 bg-accent mx-auto rounded-full" />
+          <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row items-center">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+            {/* Foto */}
+            <div className="w-full md:w-56 flex-shrink-0">
+              <img
+                src={maestroImg}
+                alt="Maestro Luciano Calazans"
+                className="w-full h-64 md:h-full object-cover object-top"
+              />
+            </div>
+
+            {/* Texto */}
+            <div className="relative z-10 p-8 text-white text-center md:text-left flex flex-col justify-center gap-3">
+              <p className="text-xs font-bold uppercase tracking-widest text-accent">Nosso Maestro Idealizador</p>
+              <h3 className="text-3xl md:text-4xl font-bold">Luciano Calazans</h3>
+              <div className="w-12 h-0.5 bg-accent rounded-full mx-auto md:mx-0" />
             </div>
           </div>
         </motion.div>
