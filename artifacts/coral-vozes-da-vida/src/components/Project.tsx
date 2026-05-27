@@ -5,7 +5,7 @@ import { Calendar, Users, Eye, Instagram, Mic2 } from 'lucide-react';
 export function Project() {
   const stats = [
     { icon: <Calendar className="text-accent" size={32} />, label: 'Ensaios realizados', value: '32' },
-    { icon: <Mic2 className="text-primary" size={32} />, label: 'Apresentações', value: '12' },
+    { icon: <Mic2 className="text-primary" size={32} />, label: 'Apresentações', value: '+20' },
     { icon: <Users className="text-accent" size={32} />, label: 'Pessoas no público', value: '10.000+' },
     { icon: <Eye className="text-primary" size={32} />, label: 'Visualizações no YouTube', value: '100.160' },
     { icon: <Instagram className="text-accent" size={32} />, label: 'Seguidores no Instagram', value: '2.500+' },
@@ -33,7 +33,7 @@ export function Project() {
         </motion.div>
 
         <div className="mt-20">
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Impacto no 1º Ano</h3>
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Impacto nos Dois Primeiros Anos</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {stats.map((stat, i) => (
               <motion.div

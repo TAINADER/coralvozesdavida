@@ -38,7 +38,7 @@ export function Goals() {
           <div className="w-24 h-1 bg-accent mx-auto rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {goals.map((goal, i) => (
             <motion.div
               key={i}
@@ -60,6 +60,24 @@ export function Goals() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-4 bg-gradient-to-r from-[#4A20BD] to-[#6B3FD4] rounded-3xl p-10 text-center text-white"
+        >
+          <Handshake className="w-12 h-12 mx-auto mb-4 opacity-90" />
+          <h3 className="text-2xl font-bold mb-3">Quer nos apoiar ou patrocinar?</h3>
+          <p className="text-white/80 text-lg mb-6">Fale com a gente e faça parte desta história de superação e esperança.</p>
+          <a
+            href="mailto:coralvozesdavida@gmail.com"
+            className="inline-block bg-[#F05D5A] hover:bg-[#d94a47] text-white font-bold px-10 py-4 rounded-full text-lg transition-colors duration-200"
+          >
+            coralvozesdavida@gmail.com
+          </a>
+        </motion.div>
       </div>
     </section>
   );

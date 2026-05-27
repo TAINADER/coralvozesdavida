@@ -2,14 +2,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Star } from 'lucide-react';
 
+import shoppingImg from '@assets/gallery_shopping_victoria.jpg';
+import casaRosaImg from '@assets/gallery_casa_rosa.jpg';
+import tcaImg from '@assets/gallery_tca.jpg';
+import hospitalImg from '@assets/gallery_hospital.jpg';
+import jantarImg from '@assets/gallery_jantar_bem.jpg';
+import eventoImg from '@assets/gallery_evento_especial.jpg';
+
 export function Gallery() {
   const events = [
-    { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", color: "bg-[#4A20BD]" },
-    { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", color: "bg-[#F05D5A]" },
-    { title: "Espetáculo Anual", venue: "TCA (Teatro Castro Alves)", date: "2024", color: "bg-blue-600" },
-    { title: "Homenagem aos Pacientes", venue: "Hospital Martagão Gesteira", date: "2024", color: "bg-[#4A20BD]" },
-    { title: "Gala Solidária", venue: "Jantar do Bem", date: "2024", color: "bg-[#F05D5A]" },
-    { title: "Celebração da Vida", venue: "Igreja / Evento Especial", date: "2024", color: "bg-teal-600" },
+    { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", img: shoppingImg },
+    { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", img: casaRosaImg },
+    { title: "Espetáculo Anual", venue: "TCA (Teatro Castro Alves)", date: "2024", img: tcaImg },
+    { title: "Homenagem aos Pacientes", venue: "Hospital Martagão Gesteira", date: "2024", img: hospitalImg },
+    { title: "Gala Solidária", venue: "Jantar do Bem", date: "2024", img: jantarImg },
+    { title: "Celebração da Vida", venue: "Evento Especial", date: "2024", img: eventoImg },
   ];
 
   const partners = [
@@ -37,22 +44,25 @@ export function Gallery() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all"
             >
-              {/* Image Placeholder */}
-              <div className={`h-48 ${event.color} relative overflow-hidden flex items-center justify-center`}>
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                <MusicNotes />
+              <div className="h-52 relative overflow-hidden">
+                <img
+                  src={event.img}
+                  alt={`${event.title} — ${event.venue}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
-              
+
               <div className="p-6 bg-white">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{event.title}</h3>
-                
+
                 <div className="space-y-2">
                   <div className="flex items-center text-gray-600">
-                    <MapPin size={18} className="mr-3 text-accent" />
+                    <MapPin size={18} className="mr-3 text-accent flex-shrink-0" />
                     <span className="font-medium">{event.venue}</span>
                   </div>
                   <div className="flex items-center text-gray-500">
-                    <Calendar size={18} className="mr-3 text-primary" />
+                    <Calendar size={18} className="mr-3 text-primary flex-shrink-0" />
                     <span>{event.date}</span>
                   </div>
                 </div>
@@ -61,13 +71,12 @@ export function Gallery() {
           ))}
         </div>
 
-        {/* Partners */}
         <div className="bg-primary/5 rounded-3xl p-10 text-center border border-primary/10">
           <Star className="w-12 h-12 text-accent mx-auto mb-6" />
           <h3 className="text-2xl font-bold text-primary mb-8">Artistas Parceiros</h3>
           <div className="flex flex-wrap justify-center gap-4 md:gap-8">
             {partners.map((partner, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -82,21 +91,5 @@ export function Gallery() {
         </div>
       </div>
     </section>
-  );
-}
-
-function MusicNotes() {
-  return (
-    <div className="flex gap-4 opacity-30">
-      <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-4 h-4 rounded-full bg-white relative">
-        <div className="absolute bottom-0 right-0 w-1 h-8 bg-white" />
-      </motion.div>
-      <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="w-4 h-4 rounded-full bg-white relative">
-        <div className="absolute bottom-0 right-0 w-1 h-10 bg-white" />
-      </motion.div>
-      <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="w-4 h-4 rounded-full bg-white relative">
-        <div className="absolute bottom-0 right-0 w-1 h-6 bg-white" />
-      </motion.div>
-    </div>
   );
 }
