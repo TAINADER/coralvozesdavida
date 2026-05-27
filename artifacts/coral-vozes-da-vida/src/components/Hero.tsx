@@ -31,12 +31,12 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/95 shadow-[0_0_40px_rgba(255,255,255,0.3)] mx-auto mb-6 flex items-center justify-center p-3"
+            className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/95 shadow-[0_0_40px_rgba(255,255,255,0.3)] mx-auto mb-6 overflow-hidden flex items-center justify-center"
           >
             <img
               src={logoImg}
               alt="Marca Coral Vozes da Vida"
-              className="w-full h-full object-contain"
+              className="w-[160%] h-[160%] object-contain scale-150"
             />
           </motion.div>
 
