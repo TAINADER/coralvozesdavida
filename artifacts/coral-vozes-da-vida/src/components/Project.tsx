@@ -1,0 +1,61 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Calendar, Users, Eye, Instagram, Mic2 } from 'lucide-react';
+
+export function Project() {
+  const stats = [
+    { icon: <Calendar className="text-accent" size={32} />, label: 'Ensaios realizados', value: '32' },
+    { icon: <Mic2 className="text-primary" size={32} />, label: 'Apresentações', value: '12' },
+    { icon: <Users className="text-accent" size={32} />, label: 'Pessoas no público', value: '10.000+' },
+    { icon: <Eye className="text-primary" size={32} />, label: 'Visualizações no YouTube', value: '100.160' },
+    { icon: <Instagram className="text-accent" size={32} />, label: 'Seguidores no Instagram', value: '2.500+' },
+  ];
+
+  return (
+    <section id="projeto" className="py-24 bg-white">
+      <div className="container mx-auto px-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">O Projeto</h2>
+          <div className="w-24 h-1 bg-accent mx-auto mb-8 rounded-full" />
+          
+          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            O Coral Vozes da Vida tem capacidade para <strong className="text-primary">100 coralistas</strong> e é aberto a ex-pacientes do Hospital Martagão Gesteira.
+          </p>
+          <p className="text-lg text-gray-700 leading-relaxed bg-primary/5 p-6 rounded-2xl border border-primary/10">
+            Cada membro recebe: <strong className="text-primary">fardamento completo</strong>, <strong className="text-primary">transporte</strong> para os ensaios e apresentações, e <strong className="text-primary">lanche</strong> durante os encontros.
+          </p>
+        </motion.div>
+
+        <div className="mt-20">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Impacto no 1º Ano</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100 hover:shadow-lg transition-shadow hover:border-primary/20 flex flex-col items-center justify-center gap-4 group"
+              >
+                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  {stat.icon}
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                  <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">{stat.label}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
