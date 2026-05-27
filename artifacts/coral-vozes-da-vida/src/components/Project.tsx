@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Eye, Instagram, Mic2 } from 'lucide-react';
+import { Calendar, Users, Eye, Instagram, Mic2, Music2 } from 'lucide-react';
 
 export function Project() {
   const stats = [
@@ -32,7 +32,29 @@ export function Project() {
           </p>
         </motion.div>
 
-        <div className="mt-20">
+        {/* Maestro Idealizador */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 max-w-2xl mx-auto"
+        >
+          <div className="relative bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-8 md:p-10 text-white text-center overflow-hidden shadow-xl">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+            <div className="relative z-10">
+              <div className="w-16 h-16 rounded-full bg-accent/20 border-2 border-accent/40 flex items-center justify-center mx-auto mb-5">
+                <Music2 size={30} className="text-accent" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Nosso Maestro Idealizador</p>
+              <h3 className="text-3xl md:text-4xl font-bold mb-3">Luciano Calazans</h3>
+              <div className="w-12 h-0.5 bg-accent mx-auto rounded-full" />
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="mt-16">
           <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Realizações do Projeto</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {stats.map((stat, i) => (
