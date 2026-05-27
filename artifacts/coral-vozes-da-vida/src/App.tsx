@@ -4,6 +4,7 @@ import { Hero } from './components/Hero';
 import { Project } from './components/Project';
 import { Goals } from './components/Goals';
 import { Gallery } from './components/Gallery';
+import { Testimonials } from './components/Testimonials';
 import { Join } from './components/Join';
 import { Footer } from './components/Footer';
 
@@ -16,6 +17,7 @@ export default function App() {
         <Project />
         <Goals />
         <Gallery />
+        <Testimonials />
         <Join />
       </main>
       <Footer />
