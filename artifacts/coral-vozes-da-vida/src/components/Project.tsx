@@ -8,7 +8,7 @@ export function Project() {
     { icon: <Mic2 className="text-primary" size={32} />, label: 'Apresentações', value: '+20' },
     { icon: <Users className="text-accent" size={32} />, label: 'Pessoas no público', value: '10.000+' },
     { icon: <Eye className="text-primary" size={32} />, label: 'Visualizações no YouTube', value: '100.160' },
-    { icon: <Instagram className="text-accent" size={32} />, label: 'Seguidores no Instagram', value: '2.500+' },
+    { icon: <Instagram className="text-accent" size={32} />, label: 'Seguidores no Instagram', value: '+3.000' },
   ];
 
   return (
