@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Heart, Music } from 'lucide-react';
+import logoImg from '@assets/logo_coral_vozes.png';
 
 export function Hero() {
   return (
@@ -26,11 +27,24 @@ export function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="max-w-4xl mx-auto"
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-white/95 shadow-[0_0_40px_rgba(255,255,255,0.3)] mx-auto mb-6 flex items-center justify-center p-3"
+          >
+            <img
+              src={logoImg}
+              alt="Marca Coral Vozes da Vida"
+              className="w-full h-full object-contain"
+            />
+          </motion.div>
+
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
             <Music size={16} className="text-accent" />
             <span className="text-sm font-medium tracking-wide">Música que transforma vidas</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8">
             Vozes da Vida <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-[#ff8c8a]">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
+import logoImg from '@assets/logo_coral_vozes.png';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -38,11 +39,14 @@ export function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <div className="flex flex-col text-white cursor-pointer" onClick={() => handleLinkClick('#inicio')}>
-          <span className="font-bold text-xl tracking-tight leading-none">Vozes da Vida</span>
-          <span className="text-[0.6rem] font-medium opacity-80 uppercase tracking-widest mt-1">
-            Coral de ex-pacientes do Martagão
-          </span>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleLinkClick('#inicio')}>
+          <img src={logoImg} alt="Marca Coral Vozes da Vida" className="h-10 w-10 object-contain drop-shadow-md" />
+          <div className="flex flex-col text-white">
+            <span className="font-bold text-xl tracking-tight leading-none">Vozes da Vida</span>
+            <span className="text-[0.6rem] font-medium opacity-80 uppercase tracking-widest mt-1">
+              Coral de ex-pacientes do Martagão
+            </span>
+          </div>
         </div>
 
         {/* Desktop Nav */}
