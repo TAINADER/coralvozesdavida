@@ -147,7 +147,7 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
           className="bg-background"
           autoComplete="off"
         />
-        {open && filtered.length > 0 && (
+        {open && (filtered.length > 0 || inputValue.trim()) && (
           <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
             {filtered.slice(0, 8).map(p => (
               <button
@@ -163,10 +163,13 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
               <button
                 type="button"
                 onMouseDown={e => { e.preventDefault(); add(inputValue.trim()); }}
-                className="w-full text-left px-4 py-2.5 text-sm border-t border-border text-primary font-semibold hover:bg-primary/10 transition-colors"
+                className={`w-full text-left px-4 py-2.5 text-sm text-primary font-semibold hover:bg-primary/10 transition-colors ${filtered.length > 0 ? "border-t border-border" : ""}`}
               >
                 + Adicionar "<strong>{inputValue.trim()}</strong>"
               </button>
+            )}
+            {filtered.length === 0 && !inputValue.trim() && (
+              <div className="px-4 py-3 text-sm text-muted-foreground italic">Nenhuma sugestão encontrada.</div>
             )}
           </div>
         )}

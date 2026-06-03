@@ -2,13 +2,16 @@ import { Router } from "express";
 import { db, professionalsTable, reviewsTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { CreateProfessionalBody, ListProfessionalsQueryParams } from "@workspace/api-zod";
-import { z } from "zod/v4";
 
-const ReviewInputSchema = z.object({
-  reviewerName: z.string().min(1).max(80).optional(),
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().max(1000).optional(),
-});
+function validateReviewInput(body: any): { reviewerName?: string; rating: number; comment?: string } | null {
+  const rating = Number(body.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return null;
+  return {
+    reviewerName: typeof body.reviewerName === "string" ? body.reviewerName.slice(0, 80) : undefined,
+    rating,
+    comment: typeof body.comment === "string" ? body.comment.slice(0, 1000) : undefined,
+  };
+}
 
 const router = Router();
 
@@ -204,16 +207,16 @@ router.post("/professionals/:id/reviews", async (req, res) => {
       .where(eq(professionalsTable.id, id));
     if (!professional) return res.status(404).json({ error: "Professional not found" });
 
-    const parsed = ReviewInputSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: "Invalid data", details: parsed.error.issues });
+    const parsed = validateReviewInput(req.body);
+    if (!parsed) return res.status(400).json({ error: "Invalid data: rating must be 1–5" });
 
     const [created] = await db
       .insert(reviewsTable)
       .values({
         professionalId: id,
-        reviewerName: parsed.data.reviewerName || "Anônimo",
-        rating: parsed.data.rating,
-        comment: parsed.data.comment ?? null,
+        reviewerName: parsed.reviewerName || "Anônimo",
+        rating: parsed.rating,
+        comment: parsed.comment ?? null,
       })
       .returning();
 
