@@ -156,7 +156,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="w-full md:w-1/2 flex flex-col h-full bg-sidebar">
+        <div className="w-full md:w-1/2 flex flex-col min-h-[520px] md:h-full bg-sidebar">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
             <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
               <TabsTrigger value="encontre" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">ENCONTRE</TabsTrigger>

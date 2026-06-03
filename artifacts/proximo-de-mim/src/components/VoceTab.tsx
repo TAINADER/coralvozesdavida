@@ -414,7 +414,7 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col min-h-full">
       <div className="flex-1 overflow-y-auto pr-2 pb-4">
       <Form {...form}>
         <form id="voce-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
