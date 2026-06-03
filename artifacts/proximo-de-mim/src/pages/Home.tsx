@@ -112,7 +112,7 @@ export default function Home() {
                   id="address-input"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Endereço, bairro ou CEP..."
+                  placeholder="Rua, número, bairro ou cidade..."
                   className="pl-10 bg-white text-black border-none focus-visible:ring-2 focus-visible:ring-accent shadow-sm"
                 />
               </div>

@@ -154,7 +154,7 @@ function AddressAutocomplete({
             value={value}
             onChange={e => handleChange(e.target.value)}
             onFocus={() => suggestions.length > 0 && setOpen(true)}
-            placeholder="Rua, número, bairro, cidade — ou CEP"
+            placeholder="Rua, número, bairro, cidade"
             className={`bg-background pr-8 ${confirmed ? "border-green-500 ring-1 ring-green-400" : ""}`}
             autoComplete="off"
           />
@@ -371,7 +371,7 @@ export default function ProfessionalProfile({
                 <label className="text-sm font-bold block mb-1 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-primary" /> Endereço
                 </label>
-                <p className="text-xs text-muted-foreground mb-1">Digite rua, bairro ou CEP e selecione uma das sugestões.</p>
+                <p className="text-xs text-muted-foreground mb-1">Digite rua, número e cidade e selecione uma das sugestões.</p>
                 <AddressAutocomplete
                   value={editAddress}
                   onChange={v => { setEditAddress(v); setPreCoords(null); }}

@@ -255,7 +255,7 @@ function AddressAutocomplete({
             value={value}
             onChange={e => handleChange(e.target.value)}
             onFocus={() => suggestions.length > 0 && setOpen(true)}
-            placeholder="Rua, número, bairro, cidade — ou CEP"
+            placeholder="Rua, número, bairro, cidade"
             className={`bg-background pr-8 ${confirmed ? "border-green-500 ring-1 ring-green-400" : ""}`}
             autoComplete="off"
           />
