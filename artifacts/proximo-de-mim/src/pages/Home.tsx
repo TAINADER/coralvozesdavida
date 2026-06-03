@@ -30,6 +30,7 @@ export default function Home() {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | number | null>(null);
   const [radiusIdx, setRadiusIdx] = useState(0); // default 100m
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
+  const [editModeOpen, setEditModeOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const radius = RADIUS_OPTIONS[radiusIdx];
@@ -180,6 +181,11 @@ export default function Home() {
               <TabsContent value="voce" className="m-0 h-full">
                 <VoceTab
                   userLocation={location}
+                  professionals={professionals}
+                  onEditProfile={(prof) => {
+                    setSelectedProfessional(prof);
+                    setEditModeOpen(true);
+                  }}
                   onAdded={() => {
                     queryClient.invalidateQueries({ queryKey: getListProfessionalsQueryKey({ lat: location.lat, lng: location.lng, radiusKm: radius.km }) });
                   }}
@@ -193,7 +199,8 @@ export default function Home() {
       {selectedProfessional && (
         <ProfessionalProfile
           professional={selectedProfessional}
-          onClose={() => setSelectedProfessional(null)}
+          defaultEditing={editModeOpen}
+          onClose={() => { setSelectedProfessional(null); setEditModeOpen(false); }}
         />
       )}
     </div>

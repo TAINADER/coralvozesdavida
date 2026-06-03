@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { getAddressFromCoords, searchAddressSuggestions, AddressSuggestion } from "@/lib/api";
+import AvailabilityPicker, { DaySchedule } from "@/components/AvailabilityPicker";
 
 type Platform = { label: string; bg: string; text: string; border: string };
 
@@ -190,10 +191,12 @@ export default function ProfessionalProfile({
   professional,
   onClose,
   onUpdated,
+  defaultEditing,
 }: {
   professional: Professional;
   onClose: () => void;
   onUpdated?: (updated: Professional) => void;
+  defaultEditing?: boolean;
 }) {
   const { data: reviews = [], isLoading: loadingReviews } = useListReviews(professional.id);
   const { mutate: submitReview, isPending: reviewPending } = useCreateReview();
@@ -201,7 +204,7 @@ export default function ProfessionalProfile({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(defaultEditing ?? false);
   const [reviewerName, setReviewerName] = useState("");
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -218,6 +221,11 @@ export default function ProfessionalProfile({
   const [editLink, setEditLink] = useState(professional.linkUrl ?? "");
   const [editSkills, setEditSkills] = useState<string[]>(skills);
   const [editLevel, setEditLevel] = useState(professional.level);
+  const [editEmail, setEditEmail] = useState((professional as any).email ?? "");
+  const [editSiteUrl, setEditSiteUrl] = useState((professional as any).siteUrl ?? "");
+  const [editAvailability, setEditAvailability] = useState<DaySchedule[]>(() => {
+    try { return JSON.parse((professional as any).availability ?? "[]"); } catch { return []; }
+  });
   const [locating, setLocating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [preCoords, setPreCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -262,8 +270,11 @@ export default function ProfessionalProfile({
           name: editName,
           address: editAddress,
           phone: editPhone || undefined,
+          email: editEmail || undefined,
+          siteUrl: editSiteUrl || undefined,
           photoUrl: editPhoto || undefined,
           linkUrl: editLink || undefined,
+          availability: editAvailability.length > 0 ? JSON.stringify(editAvailability) : undefined,
           profession: editSkills[0],
           skills: editSkills,
           level: editLevel as any,
@@ -331,7 +342,7 @@ export default function ProfessionalProfile({
           </div>
           <div className="flex items-center gap-1 ml-2">
             <button
-              onClick={() => setEditing(e => !e)}
+              onClick={() => setEditing(prev => !prev)}
               className="p-1.5 rounded-full hover:bg-white/20 transition-colors"
               title={editing ? "Ver perfil" : "Editar perfil"}
             >
@@ -373,6 +384,21 @@ export default function ProfessionalProfile({
               <div>
                 <label className="text-sm font-bold block mb-1">Telefone / WhatsApp <span className="font-normal text-muted-foreground">(opcional)</span></label>
                 <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="(11) 99999-9999" className="bg-background" />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold block mb-1">E-mail <span className="font-normal text-muted-foreground">(opcional)</span></label>
+                <Input value={editEmail} onChange={e => setEditEmail(e.target.value)} placeholder="seu@email.com" type="email" className="bg-background" />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold block mb-1">Site <span className="font-normal text-muted-foreground">(opcional)</span></label>
+                <Input value={editSiteUrl} onChange={e => setEditSiteUrl(e.target.value)} placeholder="https://meusite.com.br" className="bg-background" />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold block mb-2">Dias e horários para esta habilidade <span className="font-normal text-muted-foreground">(opcional)</span></label>
+                <AvailabilityPicker value={editAvailability} onChange={setEditAvailability} />
               </div>
 
               <div>

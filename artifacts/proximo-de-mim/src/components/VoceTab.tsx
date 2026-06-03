@@ -6,11 +6,12 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCreateProfessional } from "@workspace/api-client-react";
+import { useCreateProfessional, Professional } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { ProfessionalInputLevel } from "@workspace/api-client-react";
+import AvailabilityPicker, { DaySchedule } from "@/components/AvailabilityPicker";
 import { MapPin, Loader2, X, LocateFixed, Check } from "lucide-react";
 import { getCoordinates, getAddressFromCoords, searchAddressSuggestions, AddressSuggestion } from "@/lib/api";
 
@@ -80,60 +81,6 @@ const subjects = [
   "Espanhol", "Filosofia", "Física", "Francês", "História", "Inglês", "Instrumento musical", 
   "Japonês", "Mandarim", "Matemática", "Musculação", "Música", "Português", "Química", "Tricô", "Outro"
 ];
-
-const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
-type DaySchedule = { day: string; start: string; end: string };
-
-function AvailabilityPicker({ value, onChange }: { value: DaySchedule[]; onChange: (v: DaySchedule[]) => void }) {
-  const toggleDay = (day: string) => {
-    const exists = value.find(d => d.day === day);
-    if (exists) {
-      onChange(value.filter(d => d.day !== day));
-    } else {
-      onChange([...value, { day, start: "08:00", end: "17:00" }]);
-    }
-  };
-  const updateTime = (day: string, field: "start" | "end", time: string) => {
-    onChange(value.map(d => d.day === day ? { ...d, [field]: time } : d));
-  };
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        {WEEKDAYS.map(day => {
-          const active = value.some(d => d.day === day);
-          return (
-            <button key={day} type="button" onClick={() => toggleDay(day)}
-              className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-all ${
-                active ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted"
-              }`}>
-              {day}
-            </button>
-          );
-        })}
-      </div>
-      {value.length > 0 && (
-        <div className="space-y-2">
-          {WEEKDAYS.filter(d => value.some(v => v.day === d)).map(day => {
-            const schedule = value.find(d => d.day === day)!;
-            return (
-              <div key={day} className="flex items-center gap-3 bg-muted/40 px-3 py-2 rounded-lg">
-                <span className="text-xs font-bold w-7 text-primary">{day}</span>
-                <input type="time" value={schedule.start}
-                  onChange={e => updateTime(day, "start", e.target.value)}
-                  className="text-xs bg-white border border-border rounded-md px-2 py-1.5 w-[7rem]" />
-                <span className="text-xs text-muted-foreground">até</span>
-                <input type="time" value={schedule.end}
-                  onChange={e => updateTime(day, "end", e.target.value)}
-                  className="text-xs bg-white border border-border rounded-md px-2 py-1.5 w-[7rem]" />
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
 
 const formSchema = z.object({
   skill: z.string().min(1, "Selecione ou digite uma habilidade"),
@@ -349,14 +296,21 @@ function AddressAutocomplete({
   );
 }
 
-export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat: number; lng: number }, onAdded: () => void }) {
+export default function VoceTab({ userLocation, onAdded, professionals = [], onEditProfile }: {
+  userLocation: { lat: number; lng: number };
+  onAdded: () => void;
+  professionals?: Professional[];
+  onEditProfile?: (p: Professional) => void;
+}) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const createProfessional = useCreateProfessional();
-  
+
   const [geocoding, setGeocoding] = useState(false);
   const [locating, setLocating] = useState(false);
   const [preCoords, setPreCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editSearch, setEditSearch] = useState("");
 
   const handleUseMyLocation = async () => {
     if (!navigator.geolocation) return;
@@ -729,7 +683,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
       </div>
 
       {/* Sticky submit button — always visible at the bottom */}
-      <div className="pt-3 pb-1 border-t border-border bg-background">
+      <div className="pt-3 pb-1 border-t border-border bg-background space-y-2">
         <Button
           type="submit"
           form="voce-form"
@@ -744,6 +698,56 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             "Aparecer no Mapa"
           )}
         </Button>
+
+        {/* ── EDITAR CADASTRO EXISTENTE ── */}
+        <button
+          type="button"
+          onClick={() => setShowEdit(v => !v)}
+          className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-1 flex items-center justify-center gap-1"
+        >
+          {showEdit ? "▲" : "▼"} Já se cadastrou? Edite um serviço existente
+        </button>
+
+        {showEdit && (
+          <div className="space-y-2 pb-2">
+            <Input
+              placeholder="Buscar pelo seu nome..."
+              value={editSearch}
+              onChange={e => setEditSearch(e.target.value)}
+              className="bg-background"
+              autoComplete="off"
+            />
+            {editSearch.trim().length >= 2 && (() => {
+              const q = editSearch.trim().toLowerCase();
+              const matches = professionals.filter(p =>
+                p.name.toLowerCase().includes(q) || p.profession.toLowerCase().includes(q)
+              );
+              if (matches.length === 0) return (
+                <p className="text-xs text-muted-foreground text-center py-2 italic">
+                  Nenhum cadastro encontrado. Tente expandir o raio de busca no mapa.
+                </p>
+              );
+              return (
+                <div className="space-y-1">
+                  {matches.map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => { onEditProfile?.(p); setEditSearch(""); setShowEdit(false); }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl border border-border bg-background hover:bg-teal-50 hover:border-teal-200 transition-all flex items-center justify-between gap-2"
+                    >
+                      <div>
+                        <p className="font-bold text-sm">{p.profession}</p>
+                        <p className="text-xs text-muted-foreground">{p.name}</p>
+                      </div>
+                      <span className="text-xs font-semibold text-teal-700 shrink-0">Editar →</span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+        )}
       </div>
     </div>
   );
