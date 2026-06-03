@@ -98,8 +98,9 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const filtered = professions.filter(
-    p => p.toLowerCase().includes(inputValue.toLowerCase()) && !value.includes(p)
+    p => norm(p).includes(norm(inputValue)) && !value.includes(p)
   );
 
   useEffect(() => {

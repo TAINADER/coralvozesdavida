@@ -49,13 +49,14 @@ router.get("/professionals", async (req, res) => {
     let results = await db.select().from(professionalsTable);
 
     if (query) {
-      const q = query.toLowerCase();
+      const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const q = norm(query);
       results = results.filter(
         (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.profession.toLowerCase().includes(q) ||
-          (p.skills ?? []).some((s) => s.toLowerCase().includes(q)) ||
-          (p.professionDetail?.toLowerCase().includes(q) ?? false)
+          norm(p.name).includes(q) ||
+          norm(p.profession).includes(q) ||
+          (p.skills ?? []).some((s) => norm(s).includes(q)) ||
+          norm(p.professionDetail ?? "").includes(q)
       );
     }
 

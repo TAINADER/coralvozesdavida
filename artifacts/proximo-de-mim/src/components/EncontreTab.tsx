@@ -58,21 +58,24 @@ export default function EncontreTab({
 }: EncontreTabProps) {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
   const filteredPlaces = places.filter(p => {
     if (!debouncedSearch) return true;
-    const name = (p.tags.name || "").toLowerCase();
-    const type = (p.tags.amenity || p.tags.shop || p.tags.tourism || p.tags.leisure || "").toLowerCase();
-    const query = debouncedSearch.toLowerCase();
+    const name = norm(p.tags.name || "");
+    const type = norm(p.tags.amenity || p.tags.shop || p.tags.tourism || p.tags.leisure || "");
+    const query = norm(debouncedSearch);
     return name.includes(query) || type.includes(query);
   });
 
   const filteredProfessionals = professionals.filter(p => {
     if (!debouncedSearch) return true;
-    const name = p.name.toLowerCase();
-    const prof = p.profession.toLowerCase();
-    const detail = (p.professionDetail || "").toLowerCase();
-    const query = debouncedSearch.toLowerCase();
-    return name.includes(query) || prof.includes(query) || detail.includes(query);
+    const query = norm(debouncedSearch);
+    const name = norm(p.name);
+    const prof = norm(p.profession);
+    const detail = norm(p.professionDetail || "");
+    const skills = (p.skills ?? []).map(norm);
+    return name.includes(query) || prof.includes(query) || detail.includes(query) || skills.some(s => s.includes(query));
   });
 
   type ListItem = {
