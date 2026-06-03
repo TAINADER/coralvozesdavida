@@ -101,6 +101,8 @@ router.post("/professionals", async (req, res) => {
         name: data.name,
         photoUrl: data.photoUrl ?? null,
         linkUrl: data.linkUrl ?? null,
+        siteUrl: (data as any).siteUrl ?? null,
+        email: (data as any).email ?? null,
         profession: primaryProfession,
         skills: skills ?? null,
         professionDetail: data.professionDetail ?? null,
@@ -110,6 +112,7 @@ router.post("/professionals", async (req, res) => {
         lng: data.lng ?? null,
         address: data.address ?? null,
         phone: data.phone ?? null,
+        availability: (data as any).availability ?? null,
       })
       .returning();
 
@@ -163,6 +166,8 @@ router.put("/professionals/:id", async (req, res) => {
         phone: data.phone ?? null,
         photoUrl: data.photoUrl ?? null,
         linkUrl: data.linkUrl ?? null,
+        siteUrl: data.siteUrl ?? null,
+        email: data.email ?? null,
         profession: primaryProfession,
         skills: skills ?? null,
         professionDetail: data.professionDetail ?? null,
@@ -170,6 +175,7 @@ router.put("/professionals/:id", async (req, res) => {
         level: data.level,
         lat: data.lat ?? null,
         lng: data.lng ?? null,
+        availability: data.availability ?? null,
       })
       .where(eq(professionalsTable.id, id))
       .returning();

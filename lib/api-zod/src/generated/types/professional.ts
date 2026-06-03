@@ -14,6 +14,10 @@ export interface Professional {
   photoUrl?: string | null;
   /** @nullable */
   linkUrl?: string | null;
+  /** @nullable */
+  siteUrl?: string | null;
+  /** @nullable */
+  email?: string | null;
   profession: string;
   skills?: string[] | null;
   /** @nullable */
@@ -29,5 +33,7 @@ export interface Professional {
   address?: string | null;
   /** @nullable */
   phone?: string | null;
+  /** @nullable */
+  availability?: string | null;
   createdAt: string;
 }

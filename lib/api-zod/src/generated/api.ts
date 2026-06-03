@@ -31,6 +31,8 @@ export const ListProfessionalsResponseItem = zod.object({
   "name": zod.string(),
   "photoUrl": zod.string().nullish(),
   "linkUrl": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
+  "email": zod.string().nullish(),
   "profession": zod.string(),
   "skills": zod.array(zod.string()).nullish(),
   "professionDetail": zod.string().nullish(),
@@ -40,6 +42,7 @@ export const ListProfessionalsResponseItem = zod.object({
   "lng": zod.number().nullish(),
   "address": zod.string().nullish(),
   "phone": zod.string().nullish(),
+  "availability": zod.string().nullish(),
   "createdAt": zod.string()
 })
 export const ListProfessionalsResponse = zod.array(ListProfessionalsResponseItem)
@@ -52,6 +55,8 @@ export const CreateProfessionalBody = zod.object({
   "name": zod.string(),
   "photoUrl": zod.string().optional(),
   "linkUrl": zod.string().optional(),
+  "siteUrl": zod.string().optional(),
+  "email": zod.string().optional(),
   "profession": zod.string().optional(),
   "skills": zod.array(zod.string()),
   "professionDetail": zod.string().optional(),
@@ -60,7 +65,8 @@ export const CreateProfessionalBody = zod.object({
   "lat": zod.number().optional(),
   "lng": zod.number().optional(),
   "address": zod.string().optional(),
-  "phone": zod.string().optional()
+  "phone": zod.string().optional(),
+  "availability": zod.string().optional()
 })
 
 
@@ -86,6 +92,8 @@ export const GetProfessionalResponse = zod.object({
   "name": zod.string(),
   "photoUrl": zod.string().nullish(),
   "linkUrl": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
+  "email": zod.string().nullish(),
   "profession": zod.string(),
   "skills": zod.array(zod.string()).nullish(),
   "professionDetail": zod.string().nullish(),
@@ -95,6 +103,7 @@ export const GetProfessionalResponse = zod.object({
   "lng": zod.number().nullish(),
   "address": zod.string().nullish(),
   "phone": zod.string().nullish(),
+  "availability": zod.string().nullish(),
   "createdAt": zod.string()
 })
 
@@ -110,6 +119,8 @@ export const UpdateProfessionalBody = zod.object({
   "name": zod.string(),
   "photoUrl": zod.string().optional(),
   "linkUrl": zod.string().optional(),
+  "siteUrl": zod.string().optional(),
+  "email": zod.string().optional(),
   "profession": zod.string().optional(),
   "skills": zod.array(zod.string()),
   "professionDetail": zod.string().optional(),
@@ -118,7 +129,8 @@ export const UpdateProfessionalBody = zod.object({
   "lat": zod.number().optional(),
   "lng": zod.number().optional(),
   "address": zod.string().optional(),
-  "phone": zod.string().optional()
+  "phone": zod.string().optional(),
+  "availability": zod.string().optional()
 })
 
 export const UpdateProfessionalResponse = zod.object({
@@ -126,6 +138,8 @@ export const UpdateProfessionalResponse = zod.object({
   "name": zod.string(),
   "photoUrl": zod.string().nullish(),
   "linkUrl": zod.string().nullish(),
+  "siteUrl": zod.string().nullish(),
+  "email": zod.string().nullish(),
   "profession": zod.string(),
   "skills": zod.array(zod.string()).nullish(),
   "professionDetail": zod.string().nullish(),
@@ -135,6 +149,7 @@ export const UpdateProfessionalResponse = zod.object({
   "lng": zod.number().nullish(),
   "address": zod.string().nullish(),
   "phone": zod.string().nullish(),
+  "availability": zod.string().nullish(),
   "createdAt": zod.string()
 })
 

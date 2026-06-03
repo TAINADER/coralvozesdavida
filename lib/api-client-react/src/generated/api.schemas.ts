@@ -24,6 +24,10 @@ export interface Professional {
   photoUrl?: string | null;
   /** @nullable */
   linkUrl?: string | null;
+  /** @nullable */
+  siteUrl?: string | null;
+  /** @nullable */
+  email?: string | null;
   profession: string;
   skills?: string[] | null;
   /** @nullable */
@@ -39,6 +43,8 @@ export interface Professional {
   address?: string | null;
   /** @nullable */
   phone?: string | null;
+  /** @nullable */
+  availability?: string | null;
   createdAt: string;
 }
 
@@ -54,6 +60,8 @@ export interface ProfessionalInput {
   name: string;
   photoUrl?: string;
   linkUrl?: string;
+  siteUrl?: string;
+  email?: string;
   profession?: string;
   skills: string[];
   professionDetail?: string;
@@ -63,6 +71,7 @@ export interface ProfessionalInput {
   lng?: number;
   address?: string;
   phone?: string;
+  availability?: string;
 }
 
 export interface Review {

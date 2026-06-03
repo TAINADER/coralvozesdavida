@@ -209,6 +209,10 @@ components:
           type: ["string", "null"]
         linkUrl:
           type: ["string", "null"]
+        siteUrl:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
         profession:
           type: string
         skills:
@@ -231,6 +235,8 @@ components:
           type: ["string", "null"]
         phone:
           type: ["string", "null"]
+        availability:
+          type: ["string", "null"]
         createdAt:
           type: string
 
@@ -243,6 +249,10 @@ components:
         photoUrl:
           type: string
         linkUrl:
+          type: string
+        siteUrl:
+          type: string
+        email:
           type: string
         profession:
           type: string
@@ -264,6 +274,8 @@ components:
         address:
           type: string
         phone:
+          type: string
+        availability:
           type: string
 
     Review:

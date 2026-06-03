@@ -7,6 +7,8 @@ export const professionalsTable = pgTable("professionals", {
   name: text("name").notNull(),
   photoUrl: text("photo_url"),
   linkUrl: text("link_url"),
+  siteUrl: text("site_url"),
+  email: text("email"),
   profession: text("profession").notNull(),
   skills: text("skills").array(),
   professionDetail: text("profession_detail"),
@@ -16,6 +18,7 @@ export const professionalsTable = pgTable("professionals", {
   lng: real("lng"),
   address: text("address"),
   phone: text("phone"),
+  availability: text("availability"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

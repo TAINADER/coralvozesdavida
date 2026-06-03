@@ -11,6 +11,8 @@ export interface ProfessionalInput {
   name: string;
   photoUrl?: string;
   linkUrl?: string;
+  siteUrl?: string;
+  email?: string;
   profession?: string;
   skills: string[];
   professionDetail?: string;
@@ -20,4 +22,5 @@ export interface ProfessionalInput {
   lng?: number;
   address?: string;
   phone?: string;
+  availability?: string;
 }

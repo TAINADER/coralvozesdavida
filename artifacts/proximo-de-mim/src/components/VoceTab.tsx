@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import Fuse from "fuse.js";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -80,12 +81,69 @@ const subjects = [
   "Japonês", "Mandarim", "Matemática", "Musculação", "Música", "Português", "Química", "Tricô", "Outro"
 ];
 
+const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+type DaySchedule = { day: string; start: string; end: string };
+
+function AvailabilityPicker({ value, onChange }: { value: DaySchedule[]; onChange: (v: DaySchedule[]) => void }) {
+  const toggleDay = (day: string) => {
+    const exists = value.find(d => d.day === day);
+    if (exists) {
+      onChange(value.filter(d => d.day !== day));
+    } else {
+      onChange([...value, { day, start: "08:00", end: "17:00" }]);
+    }
+  };
+  const updateTime = (day: string, field: "start" | "end", time: string) => {
+    onChange(value.map(d => d.day === day ? { ...d, [field]: time } : d));
+  };
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {WEEKDAYS.map(day => {
+          const active = value.some(d => d.day === day);
+          return (
+            <button key={day} type="button" onClick={() => toggleDay(day)}
+              className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-all ${
+                active ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted"
+              }`}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      {value.length > 0 && (
+        <div className="space-y-2">
+          {WEEKDAYS.filter(d => value.some(v => v.day === d)).map(day => {
+            const schedule = value.find(d => d.day === day)!;
+            return (
+              <div key={day} className="flex items-center gap-3 bg-muted/40 px-3 py-2 rounded-lg">
+                <span className="text-xs font-bold w-7 text-primary">{day}</span>
+                <input type="time" value={schedule.start}
+                  onChange={e => updateTime(day, "start", e.target.value)}
+                  className="text-xs bg-white border border-border rounded-md px-2 py-1.5 w-[7rem]" />
+                <span className="text-xs text-muted-foreground">até</span>
+                <input type="time" value={schedule.end}
+                  onChange={e => updateTime(day, "end", e.target.value)}
+                  className="text-xs bg-white border border-border rounded-md px-2 py-1.5 w-[7rem]" />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
   address: z.string().min(5, "Endereço é obrigatório"),
   phone: z.string().optional(),
+  email: z.string().email("E-mail inválido").optional().or(z.literal("")),
+  siteUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   photoUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   linkUrl: z.string().url("URL inválida").optional().or(z.literal("")),
+  availability: z.array(z.object({ day: z.string(), start: z.string(), end: z.string() })).optional(),
   skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
   professionDetail: z.string().optional(),
   lessonType: z.string().optional(),
@@ -98,10 +156,12 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const filtered = professions.filter(
-    p => norm(p).includes(norm(inputValue)) && !value.includes(p)
-  );
+  const fuse = useMemo(() => new Fuse(professions, { threshold: 0.35, includeScore: true }), []);
+  const filtered = useMemo(() => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return professions.filter(p => !value.includes(p)).slice(0, 8);
+    return fuse.search(trimmed).map(r => r.item).filter(p => !value.includes(p));
+  }, [inputValue, value, fuse]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -316,8 +376,11 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
       name: "",
       address: "",
       phone: "",
+      email: "",
+      siteUrl: "",
       photoUrl: "",
       linkUrl: "",
+      availability: [],
       skills: [],
       professionDetail: "",
       lessonType: "",
@@ -352,8 +415,11 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
         name: data.name,
         address: data.address,
         phone: data.phone || undefined,
+        email: data.email || undefined,
+        siteUrl: data.siteUrl || undefined,
         photoUrl: data.photoUrl || undefined,
         linkUrl: data.linkUrl || undefined,
+        availability: data.availability && data.availability.length > 0 ? JSON.stringify(data.availability) : undefined,
         profession: data.skills[0] ?? "",
         skills: data.skills,
         professionDetail: data.professionDetail || undefined,
@@ -386,15 +452,111 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto pr-2 pb-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-primary mb-2">Junte-se à vizinhança</h2>
+        <h2 className="text-2xl font-bold text-primary mb-2">Cadastre seu Serviço</h2>
         <p className="text-muted-foreground text-sm">Cadastre-se para que as pessoas perto de você possam encontrar seus serviços.</p>
       </div>
 
       <Form {...form}>
         <form id="voce-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          {/* 1. HABILIDADES — primeiro */}
           <FormField
             control={form.control}
-            name="name"
+            name="skills"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Suas habilidades</FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">Ajude as pessoas a poder contar com você!</p>
+                <FormControl>
+                  <SkillsInput value={field.value} onChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {isProfessor && (
+            <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
+              <FormField
+                control={form.control}
+                name="lessonType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Tipo de aula</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-3">
+                        {["Aula avulsa", "Aula periódica"].map(opt => (
+                          <button key={opt} type="button" onClick={() => field.onChange(opt)}
+                            className={`flex-1 py-2.5 px-3 rounded-xl border-2 text-sm font-bold transition-all ${
+                              field.value === opt
+                                ? "border-primary bg-primary text-primary-foreground shadow-md"
+                                : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}>
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="professionDetail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Matéria <span className="font-normal text-muted-foreground">(opcional)</span></FormLabel>
+                    <FormControl>
+                      <div className="flex flex-wrap gap-2">
+                        {subjects.map(s => (
+                          <button key={s} type="button" onClick={() => field.onChange(field.value === s ? "" : s)}
+                            className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+                              field.value === s
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {isMusico && (
+            <FormField control={form.control} name="professionDetail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Qual modalidade?</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Violão, Canto, Banda..." className="bg-background" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {isMedico && (
+            <FormField control={form.control} name="professionDetail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Qual especialidade?</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Pediatria, Cardiologia..." className="bg-background" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {/* 2. NOME */}
+          <FormField control={form.control} name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">Nome</FormLabel>
@@ -406,9 +568,8 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="address"
+          {/* 3. ENDEREÇO */}
+          <FormField control={form.control} name="address"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold flex items-center gap-1.5">
@@ -432,9 +593,8 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="phone"
+          {/* 4. TELEFONE */}
+          <FormField control={form.control} name="phone"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">Telefone / WhatsApp <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
@@ -446,170 +606,93 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="photoUrl"
+          {/* 5. E-MAIL */}
+          <FormField control={form.control} name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Foto (URL) <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
+                <FormLabel className="font-bold">E-mail <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="Link para sua foto" className="bg-background" {...field} />
+                  <Input placeholder="seu@email.com" type="email" className="bg-background" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="linkUrl"
+          {/* 6. SITE */}
+          <FormField control={form.control} name="siteUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Link profissional</FormLabel>
+                <FormLabel className="font-bold">Site <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="Instagram, LinkedIn, site (opcional)" className="bg-background" {...field} />
+                  <Input placeholder="https://meusite.com.br" className="bg-background" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="skills"
+          {/* 7. REDES SOCIAIS */}
+          <FormField control={form.control} name="linkUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Suas habilidades</FormLabel>
-                <p className="text-xs text-muted-foreground -mt-1">Adicione quantas quiser — ajuda as pessoas a te encontrarem!</p>
+                <FormLabel className="font-bold">Redes sociais <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
                 <FormControl>
-                  <SkillsInput value={field.value} onChange={field.onChange} />
+                  <Input placeholder="Instagram, LinkedIn, YouTube..." className="bg-background" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {isProfessor && (
-            <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
-              <FormField
-                control={form.control}
-                name="lessonType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Tipo de aula</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-3">
-                        {["Aula avulsa", "Aula periódica"].map(opt => (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => field.onChange(opt)}
-                            className={`flex-1 py-2.5 px-3 rounded-xl border-2 text-sm font-bold transition-all ${
-                              field.value === opt
-                                ? "border-primary bg-primary text-primary-foreground shadow-md"
-                                : "border-border bg-background text-muted-foreground hover:bg-muted"
-                            }`}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="professionDetail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Matéria <span className="font-normal text-muted-foreground">(opcional)</span></FormLabel>
-                    <FormControl>
-                      <div className="flex flex-wrap gap-2">
-                        {subjects.map(s => (
-                          <button
-                            key={s}
-                            type="button"
-                            onClick={() => field.onChange(field.value === s ? "" : s)}
-                            className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
-                              field.value === s
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-border bg-background text-muted-foreground hover:bg-muted"
-                            }`}
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
+          {/* 8. FOTO */}
+          <FormField control={form.control} name="photoUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Foto <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="Link para sua foto (URL)" className="bg-background" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          {isMusico && (
-            <FormField
-              control={form.control}
-              name="professionDetail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">Qual modalidade?</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Violão, Canto, Banda..." className="bg-background" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+          {/* 9. HORÁRIOS */}
+          <FormField control={form.control} name="availability"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Dias e horários de atendimento <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">Selecione os dias e defina os horários em que você atende.</p>
+                <FormControl>
+                  <AvailabilityPicker value={field.value ?? []} onChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          {isMedico && (
-            <FormField
-              control={form.control}
-              name="professionDetail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">Qual especialidade?</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Pediatria, Cardiologia..." className="bg-background" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
-          <FormField
-            control={form.control}
-            name="level"
+          {/* 10. NÍVEL */}
+          <FormField control={form.control} name="level"
             render={({ field }) => (
               <FormItem className="pt-2">
                 <FormLabel className="font-bold block mb-3">Nível</FormLabel>
                 <FormControl>
                   <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => field.onChange("amador")}
+                    <button type="button" onClick={() => field.onChange("amador")}
                       className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all ${
-                        field.value === "amador" 
-                          ? "border-primary bg-primary text-primary-foreground shadow-md" 
+                        field.value === "amador"
+                          ? "border-primary bg-primary text-primary-foreground shadow-md"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
+                      }`}>
                       Amador
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => field.onChange("profissional")}
+                    <button type="button" onClick={() => field.onChange("profissional")}
                       className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all ${
-                        field.value === "profissional" 
-                          ? "border-primary bg-primary text-primary-foreground shadow-md" 
+                        field.value === "profissional"
+                          ? "border-primary bg-primary text-primary-foreground shadow-md"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
+                      }`}>
                       Profissional
                     </button>
                   </div>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import Fuse from "fuse.js";
 import { Input } from "@/components/ui/input";
 import { OverpassPlace } from "@/lib/api";
 import { Professional } from "@workspace/api-client-react";
@@ -60,6 +61,12 @@ export default function EncontreTab({
 
   const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+  const profFuse = useMemo(() => new Fuse(professionals, {
+    keys: ["name", "profession", "professionDetail", "skills"],
+    threshold: 0.35,
+    ignoreLocation: true,
+  }), [professionals]);
+
   const filteredPlaces = places.filter(p => {
     if (!debouncedSearch) return true;
     const name = norm(p.tags.name || "");
@@ -68,15 +75,10 @@ export default function EncontreTab({
     return name.includes(query) || type.includes(query);
   });
 
-  const filteredProfessionals = professionals.filter(p => {
-    if (!debouncedSearch) return true;
-    const query = norm(debouncedSearch);
-    const name = norm(p.name);
-    const prof = norm(p.profession);
-    const detail = norm(p.professionDetail || "");
-    const skills = (p.skills ?? []).map(norm);
-    return name.includes(query) || prof.includes(query) || detail.includes(query) || skills.some(s => s.includes(query));
-  });
+  const filteredProfessionals = useMemo(() => {
+    if (!debouncedSearch) return professionals;
+    return profFuse.search(debouncedSearch).map(r => r.item);
+  }, [debouncedSearch, professionals, profFuse]);
 
   type ListItem = {
     id: string | number;

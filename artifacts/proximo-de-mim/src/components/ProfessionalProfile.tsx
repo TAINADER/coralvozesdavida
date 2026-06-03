@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useListReviews, useCreateReview, useUpdateProfessional, Professional, getListReviewsQueryKey, getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { X, Star, MapPin, ExternalLink, User, Loader2, MessageSquare, Send, Phone, Pencil, Check, LocateFixed } from "lucide-react";
+import { X, Star, MapPin, ExternalLink, User, Loader2, MessageSquare, Send, Phone, Pencil, Check, LocateFixed, Clock, Mail, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -444,7 +444,40 @@ export default function ProfessionalProfile({
                   <Phone className="w-4 h-4" />{professional.phone}
                 </a>
               )}
+              {(professional as any).email && (
+                <a href={`mailto:${(professional as any).email}`}
+                  className="flex items-center gap-2 text-sm text-blue-700 font-semibold hover:underline">
+                  <Mail className="w-4 h-4" />{(professional as any).email}
+                </a>
+              )}
+              {(professional as any).siteUrl && <LinkPreviewCard url={(professional as any).siteUrl} />}
               {professional.linkUrl && <LinkPreviewCard url={professional.linkUrl} />}
+
+              {(() => {
+                const raw = (professional as any).availability;
+                if (!raw) return null;
+                try {
+                  const schedules: { day: string; start: string; end: string }[] = JSON.parse(raw);
+                  if (!schedules.length) return null;
+                  const DAYS_ORDER = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+                  const sorted = [...schedules].sort((a,b) => DAYS_ORDER.indexOf(a.day) - DAYS_ORDER.indexOf(b.day));
+                  return (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-sm font-bold text-foreground">
+                        <Clock className="w-4 h-4 text-primary" /> Horários de atendimento
+                      </div>
+                      <div className="space-y-1 pl-1">
+                        {sorted.map(s => (
+                          <div key={s.day} className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="font-semibold text-primary w-7">{s.day}</span>
+                            <span>{s.start} – {s.end}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                } catch { return null; }
+              })()}
 
               <div className="border-t border-border" />
 
