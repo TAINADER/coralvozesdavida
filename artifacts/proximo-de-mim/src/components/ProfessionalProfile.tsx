@@ -127,7 +127,11 @@ export default function ProfessionalProfile({ professional, onClose }: { profess
               </div>
               <div>
                 <h2 className="text-xl font-extrabold leading-tight">{professional.name}</h2>
-                <p className="text-sm opacity-80 capitalize">{professional.profession}{professional.professionDetail ? ` · ${professional.professionDetail}` : ""}</p>
+                <div className="flex flex-wrap gap-1 mt-0.5">
+                  {((professional as any).skills?.length ? (professional as any).skills : [professional.profession]).map((s: string) => (
+                    <span key={s} className="text-xs bg-white/20 px-2 py-0.5 rounded-full font-semibold capitalize">{s}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

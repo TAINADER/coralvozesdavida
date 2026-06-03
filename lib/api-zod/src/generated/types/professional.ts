@@ -15,6 +15,7 @@ export interface Professional {
   /** @nullable */
   linkUrl?: string | null;
   profession: string;
+  skills?: string[] | null;
   /** @nullable */
   professionDetail?: string | null;
   /** @nullable */

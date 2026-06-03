@@ -8,6 +8,7 @@ export const professionalsTable = pgTable("professionals", {
   photoUrl: text("photo_url"),
   linkUrl: text("link_url"),
   profession: text("profession").notNull(),
+  skills: text("skills").array(),
   professionDetail: text("profession_detail"),
   lessonType: text("lesson_type"),
   level: text("level").notNull().default("profissional"),

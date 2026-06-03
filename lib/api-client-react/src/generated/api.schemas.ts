@@ -25,6 +25,7 @@ export interface Professional {
   /** @nullable */
   linkUrl?: string | null;
   profession: string;
+  skills?: string[] | null;
   /** @nullable */
   professionDetail?: string | null;
   /** @nullable */
@@ -53,7 +54,8 @@ export interface ProfessionalInput {
   name: string;
   photoUrl?: string;
   linkUrl?: string;
-  profession: string;
+  profession?: string;
+  skills: string[];
   professionDetail?: string;
   lessonType?: string;
   level: ProfessionalInputLevel;

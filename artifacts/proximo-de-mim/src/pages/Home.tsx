@@ -100,7 +100,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground font-sans">
       <header className="bg-primary text-primary-foreground p-6 shadow-md z-10 relative">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-extrabold tracking-tight mb-4">PRÓXIMO DE MIM</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight mb-4">PERTO DE MIM</h1>
           <form onSubmit={handleAddressSubmit}>
             <label htmlFor="address-input" className="block text-sm font-semibold mb-2 opacity-90">
               ONDE VOCÊ ESTÁ?

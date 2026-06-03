@@ -81,9 +81,11 @@ export default function MapComponent({ location, zoom, places, professionals, se
             <Popup>
               <div className="font-sans min-w-[160px]">
                 <strong className="block text-base mb-0.5">{prof.name}</strong>
-                <span className="text-sm text-gray-500 block capitalize">
-                  {prof.profession}{prof.professionDetail ? ` — ${prof.professionDetail}` : ""}
-                </span>
+                <div className="flex flex-wrap gap-1 mb-1">
+                  {((prof as any).skills?.length ? (prof as any).skills : [prof.profession]).map((s: string) => (
+                    <span key={s} className="text-xs bg-orange-100 text-orange-800 px-1.5 py-0.5 rounded font-medium capitalize">{s}</span>
+                  ))}
+                </div>
                 <span className="inline-block mt-1 mb-2 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-bold rounded">
                   {prof.level === "profissional" ? "Profissional" : "Amador"}
                 </span>

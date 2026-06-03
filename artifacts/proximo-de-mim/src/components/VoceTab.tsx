@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { ProfessionalInputLevel } from "@workspace/api-client-react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, X, MapPin, Loader2 } from "lucide-react";
 
 const professions = [
   // Música & Artes
@@ -82,105 +82,106 @@ const subjects = [
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
+  address: z.string().min(5, "Endereço é obrigatório"),
   phone: z.string().optional(),
   photoUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   linkUrl: z.string().url("URL inválida").optional().or(z.literal("")),
-  profession: z.string().min(1, "Selecione uma profissão"),
+  skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
   professionDetail: z.string().optional(),
   lessonType: z.string().optional(),
   level: z.enum(["amador", "profissional"]),
 });
 
-function ProfessionCombobox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const [inputValue, setInputValue] = useState(value);
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=br&limit=1`;
+    const res = await fetch(url, { headers: { "Accept-Language": "pt-BR" } });
+    const data = await res.json();
+    if (data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filtered = professions.filter(p => p.toLowerCase().includes(inputValue.toLowerCase()));
-
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+  const filtered = professions.filter(
+    p => p.toLowerCase().includes(inputValue.toLowerCase()) && !value.includes(p)
+  );
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
-        if (inputValue.trim()) onChange(inputValue.trim());
       }
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [inputValue, onChange]);
+  }, []);
 
-  const select = (p: string) => {
-    setInputValue(p);
-    onChange(p);
-    setOpen(false);
-  };
-
-  const clear = () => {
+  const add = (skill: string) => {
+    const trimmed = skill.trim();
+    if (trimmed && !value.includes(trimmed)) onChange([...value, trimmed]);
     setInputValue("");
-    onChange("");
     setOpen(false);
   };
+
+  const remove = (skill: string) => onChange(value.filter(s => s !== skill));
 
   return (
-    <div ref={containerRef} className="relative">
-      <div className="relative flex items-center">
+    <div ref={containerRef} className="space-y-2">
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {value.map(s => (
+            <span key={s} className="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground text-sm font-semibold rounded-full">
+              {s}
+              <button type="button" onClick={() => remove(s)} className="hover:opacity-70 transition-opacity ml-0.5">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="relative">
         <Input
           value={inputValue}
-          onChange={e => { setInputValue(e.target.value); onChange(e.target.value); setOpen(e.target.value.trim().length > 0); }}
-          onFocus={() => { if (inputValue.trim().length > 0) setOpen(true); }}
+          onChange={e => { setInputValue(e.target.value); setOpen(e.target.value.trim().length > 0); }}
           onKeyDown={e => {
-            if (e.key === "Escape") { setOpen(false); (e.target as HTMLInputElement).blur(); }
-            if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); onChange(inputValue.trim()); setOpen(false); }
+            if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); add(inputValue); }
+            if (e.key === "Escape") setOpen(false);
           }}
-          placeholder="Digite ou escolha uma profissão..."
-          className="bg-background pr-14"
+          placeholder={value.length === 0 ? "Digite uma habilidade e pressione Enter..." : "Adicionar mais..."}
+          className="bg-background"
           autoComplete="off"
         />
-        <div className="absolute right-2 flex items-center gap-1">
-          {inputValue && (
-            <button type="button" onClick={clear} className="p-1 text-muted-foreground hover:text-foreground">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-          <button type="button" onClick={() => setOpen(o => !o)} className="p-1 text-muted-foreground hover:text-foreground">
-            <ChevronDown className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} />
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-56 overflow-y-auto">
-          {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-muted-foreground">
-              Não encontrado — pressione Enter para usar <strong>"{inputValue}"</strong>
-            </div>
-          ) : (
-            filtered.map(p => (
+        {open && filtered.length > 0 && (
+          <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
+            {filtered.slice(0, 8).map(p => (
               <button
                 key={p}
                 type="button"
-                onMouseDown={e => { e.preventDefault(); select(p); }}
-                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 transition-colors ${p === value ? "font-bold text-primary bg-primary/5" : ""}`}
+                onMouseDown={e => { e.preventDefault(); add(p); }}
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 transition-colors"
               >
                 {p}
               </button>
-            ))
-          )}
-          {inputValue.trim() && !professions.some(p => p.toLowerCase() === inputValue.toLowerCase()) && (
-            <button
-              type="button"
-              onMouseDown={e => { e.preventDefault(); select(inputValue.trim()); }}
-              className="w-full text-left px-4 py-2.5 text-sm border-t border-border text-primary font-semibold hover:bg-primary/10 transition-colors"
-            >
-              + Usar "<strong>{inputValue.trim()}</strong>"
-            </button>
-          )}
-        </div>
-      )}
+            ))}
+            {inputValue.trim() && !professions.some(p => p.toLowerCase() === inputValue.toLowerCase()) && (
+              <button
+                type="button"
+                onMouseDown={e => { e.preventDefault(); add(inputValue.trim()); }}
+                className="w-full text-left px-4 py-2.5 text-sm border-t border-border text-primary font-semibold hover:bg-primary/10 transition-colors"
+              >
+                + Adicionar "<strong>{inputValue.trim()}</strong>"
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -190,36 +191,57 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   const queryClient = useQueryClient();
   const createProfessional = useCreateProfessional();
   
+  const [geocoding, setGeocoding] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      address: "",
       phone: "",
       photoUrl: "",
       linkUrl: "",
-      profession: "",
+      skills: [],
       professionDetail: "",
       lessonType: "",
       level: "profissional",
     },
   });
 
-  const selectedProfession = form.watch("profession");
+  const selectedSkills = form.watch("skills") ?? [];
+  const isProfessor = selectedSkills.some(s => s.toLowerCase().startsWith("professor"));
+  const isMusico = selectedSkills.some(s => ["músico", "musico", "cantor", "guitarrista", "violonista", "baixista", "baterista", "pianista", "saxofonista", "instrumentista"].some(k => s.toLowerCase().includes(k)));
+  const isMedico = selectedSkills.some(s => s.toLowerCase() === "médico" || s.toLowerCase() === "medico");
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setGeocoding(true);
+    const coords = await geocodeAddress(data.address);
+    setGeocoding(false);
+
+    if (!coords) {
+      toast({
+        variant: "destructive",
+        title: "Endereço não encontrado",
+        description: "Tente usar um endereço mais completo, com rua, número e cidade.",
+      });
+      return;
+    }
+
     createProfessional.mutate({
       data: {
         name: data.name,
+        address: data.address,
         phone: data.phone || undefined,
         photoUrl: data.photoUrl || undefined,
         linkUrl: data.linkUrl || undefined,
-        profession: data.profession,
+        profession: data.skills[0] ?? "",
+        skills: data.skills,
         professionDetail: data.professionDetail || undefined,
         lessonType: data.lessonType || undefined,
         level: data.level as ProfessionalInputLevel,
-        lat: userLocation.lat,
-        lng: userLocation.lng,
-      }
+        lat: coords.lat,
+        lng: coords.lng,
+      } as any
     }, {
       onSuccess: () => {
         toast({
@@ -257,6 +279,24 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                 <FormLabel className="font-bold">Nome</FormLabel>
                 <FormControl>
                   <Input placeholder="Seu nome completo" className="bg-background" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Endereço
+                </FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">Onde as pessoas vão te encontrar no mapa. Ex: Rua das Flores, 123, Vila Madalena, São Paulo</p>
+                <FormControl>
+                  <Input placeholder="Rua, número, bairro, cidade" className="bg-background" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -307,19 +347,20 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
 
           <FormField
             control={form.control}
-            name="profession"
+            name="skills"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">O que você pode fazer?</FormLabel>
+                <FormLabel className="font-bold">Suas habilidades</FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">Adicione quantas quiser — ajuda as pessoas a te encontrarem!</p>
                 <FormControl>
-                  <ProfessionCombobox value={field.value} onChange={field.onChange} />
+                  <SkillsInput value={field.value} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {selectedProfession === "Professor" && (
+          {isProfessor && (
             <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
               <FormField
                 control={form.control}
@@ -367,7 +408,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             </div>
           )}
 
-          {selectedProfession === "Músico profissional" && (
+          {isMusico && (
             <FormField
               control={form.control}
               name="professionDetail"
@@ -383,7 +424,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             />
           )}
 
-          {selectedProfession === "Médico" && (
+          {isMedico && (
             <FormField
               control={form.control}
               name="professionDetail"
@@ -439,9 +480,15 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
           <Button 
             type="submit" 
             className="w-full h-14 text-lg font-bold mt-6 shadow-lg hover:shadow-xl transition-all" 
-            disabled={createProfessional.isPending}
+            disabled={geocoding || createProfessional.isPending}
           >
-            {createProfessional.isPending ? "Cadastrando..." : "Aparecer no Mapa"}
+            {geocoding ? (
+              <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Localizando endereço...</span>
+            ) : createProfessional.isPending ? (
+              "Cadastrando..."
+            ) : (
+              "Aparecer no Mapa"
+            )}
           </Button>
         </form>
       </Form>

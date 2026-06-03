@@ -51,6 +51,7 @@ router.get("/professionals", async (req, res) => {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.profession.toLowerCase().includes(q) ||
+          (p.skills ?? []).some((s) => s.toLowerCase().includes(q)) ||
           (p.professionDetail?.toLowerCase().includes(q) ?? false)
       );
     }
@@ -88,13 +89,16 @@ router.post("/professionals", async (req, res) => {
     }
 
     const data = parsed.data;
+    const skills = (data as any).skills as string[] | undefined;
+    const primaryProfession = skills && skills.length > 0 ? skills[0] : ((data as any).profession ?? "");
     const [created] = await db
       .insert(professionalsTable)
       .values({
         name: data.name,
         photoUrl: data.photoUrl ?? null,
         linkUrl: data.linkUrl ?? null,
-        profession: data.profession,
+        profession: primaryProfession,
+        skills: skills ?? null,
         professionDetail: data.professionDetail ?? null,
         lessonType: data.lessonType ?? null,
         level: data.level,

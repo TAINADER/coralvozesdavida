@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/proximo-de-mim/"
-title = "Próximo de Mim"
+title = "Perto de Mim"
 version = "1.0.0"
 id = "artifacts/proximo-de-mim"
 router = "path"

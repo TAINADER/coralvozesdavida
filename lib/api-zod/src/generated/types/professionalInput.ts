@@ -11,7 +11,8 @@ export interface ProfessionalInput {
   name: string;
   photoUrl?: string;
   linkUrl?: string;
-  profession: string;
+  profession?: string;
+  skills: string[];
   professionDetail?: string;
   lessonType?: string;
   level: ProfessionalInputLevel;
