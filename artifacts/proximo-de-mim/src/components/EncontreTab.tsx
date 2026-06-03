@@ -62,21 +62,28 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
     kind: "place" | "professional";
   };
 
+  const MAX_KM = 3;
+
   const listItems: ListItem[] = [
-    ...filteredPlaces.map(p => ({
-      id: p.id,
-      name: p.tags.name || "Local",
-      type: p.tags.amenity || p.tags.shop || p.tags.tourism || p.tags.leisure || "Estabelecimento",
-      distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lon),
-      kind: "place" as const
-    })),
-    ...filteredProfessionals.map(p => ({
-      id: p.id,
-      name: p.name,
-      type: p.profession + (p.professionDetail ? ` - ${p.professionDetail}` : ""),
-      distance: p.lat && p.lng ? calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lng) : 0,
-      kind: "professional" as const
-    }))
+    ...filteredPlaces
+      .map(p => ({
+        id: p.id,
+        name: p.tags.name || "Local",
+        type: p.tags.amenity || p.tags.shop || p.tags.tourism || p.tags.leisure || "Estabelecimento",
+        distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lon),
+        kind: "place" as const
+      }))
+      .filter(p => p.distance <= MAX_KM),
+    ...filteredProfessionals
+      .filter(p => p.lat != null && p.lng != null)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        type: p.profession + (p.professionDetail ? ` - ${p.professionDetail}` : ""),
+        distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat!, p.lng!),
+        kind: "professional" as const
+      }))
+      .filter(p => p.distance <= MAX_KM)
   ].sort((a, b) => a.distance - b.distance);
 
   return (
@@ -99,7 +106,8 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
           </div>
         ) : listItems.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p>Nenhum resultado encontrado para a busca.</p>
+            <p className="font-semibold">Nada encontrado nos 3km ao redor.</p>
+            <p className="text-sm mt-1">Tente outro termo ou verifique seu endereço.</p>
           </div>
         ) : (
           listItems.map(item => (
