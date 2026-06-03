@@ -14,14 +14,64 @@ import { ProfessionalInputLevel } from "@workspace/api-client-react";
 import { ChevronDown, X } from "lucide-react";
 
 const professions = [
-  "Auxiliar de enfermagem", "Baby sitter", "Barista", "Cantor", "Carpinteiro", "Chef de cozinha", 
-  "Compositor", "Conserto de computador", "Conserto de eletrônicos", "Datógrafo", "Designer", 
-  "Eletricista", "Enfermeira", "Engenheiro elétrico", "Escritor", "Faxina", "Fisioterapeuta", 
-  "Fotógrafo", "Jardineiro", "Marceneiro", "Massagista", "Médico", "Mecânico", "Músico profissional", 
-  "Nutricionista", "Passeio com cachorro", "Pequenos reparos domésticos", "Personal trainer", "Pintor", 
-  "Professor", "Psicólogo", "Revisor ortográfico", "Segurança", "Sushi man", "Terapeuta ABA", 
-  "Terapeuta ocupacional", "Veterinário", "e qualquer outra profissão de serviço"
-];
+  // Música & Artes
+  "Acordeonista", "Ator", "Atriz", "Bailarina", "Bailarino", "Baixista", "Baterista",
+  "Cantor", "Cantor lírico", "Cantor de MPB", "Cantor de samba", "Cantor de forró", "Cantor de gospel",
+  "Cantor de pagode", "Cantor de funk", "Cantor de rock", "Cantor de sertanejo",
+  "Cavaquinhista", "Celista", "Clarinetista", "Contrabaixista", "Compositor",
+  "Dançarino", "DJ", "Dublador", "Flautista", "Fotógrafo", "Guitarrista",
+  "Instrumentista", "Maestro", "Músico", "Percussionista", "Pianista",
+  "Produtor musical", "Saxofonista", "Sonoplasta", "Trombonista", "Trompetista",
+  "Vídeo maker", "Violinista", "Violoncelista", "Violonista",
+
+  // Saúde & Bem-estar
+  "Acupunturista", "Assistente social", "Auxiliar de enfermagem", "Biomédico",
+  "Cirurgião dentista", "Dentista", "Dermatologista", "Enfermeira", "Enfermeiro",
+  "Esteticista", "Farmacêutico", "Fisioterapeuta", "Fonoaudiólogo",
+  "Massoterapeuta", "Massagista", "Médico", "Médico clínico geral",
+  "Nutricionista", "Oftalmologista", "Ortopedista", "Pediatra",
+  "Personal trainer", "Psicólogo", "Psicopedagogo", "Psiquiatra",
+  "Quiroprata", "Terapeuta ABA", "Terapeuta holístico", "Terapeuta ocupacional",
+  "Veterinário",
+
+  // Educação
+  "Professor", "Professor de artes", "Professor de canto", "Professor de dança",
+  "Professor de educação física", "Professor de idiomas", "Professor de informática",
+  "Professor de instrumentos musicais", "Professor de matemática", "Professor de música",
+  "Professor de yoga", "Tutor", "Pedagogo",
+
+  // Tecnologia
+  "Analista de dados", "Analista de sistemas", "Consultor de TI",
+  "Conserto de computador", "Conserto de celular", "Conserto de eletrônicos",
+  "Designer gráfico", "Designer de interiores", "Designer UX/UI",
+  "Desenvolvedor de software", "Desenvolvedor web", "Especialista em redes",
+  "Instalação de câmeras", "Suporte técnico", "Técnico de informática",
+
+  // Casa & Reforma
+  "Azulejista", "Bombeiro hidráulico", "Carpinteiro", "Eletricista",
+  "Encanador", "Faxineira", "Gesseiro", "Instalação de ar-condicionado",
+  "Instalação de energia solar", "Jardineiro", "Limpeza pós-obra",
+  "Marceneiro", "Pedreiro", "Pequenos reparos domésticos", "Pintor",
+  "Piscineiro", "Serralheiro", "Vidraceiro",
+
+  // Beleza
+  "Barbeiro", "Cabeleireiro", "Depiladora", "Esteticista facial",
+  "Manicure", "Maquiadora", "Micropigmentador", "Pedicure", "Sobrancelhista",
+
+  // Alimentação
+  "Barista", "Bartender", "Chef de cozinha", "Confeiteiro",
+  "Cozinheiro", "Doceira", "Padeiro", "Sushiman",
+
+  // Serviços & Outros
+  "Advogado", "Arquiteto", "Assistente virtual", "Baby sitter",
+  "Chaveiro", "Contador", "Corretor de imóveis", "Costureira",
+  "Cuidador de idosos", "Datilógrafo", "Decorador", "Detetive particular",
+  "Digitador", "Editor de vídeo", "Escritor", "Fotógrafo de eventos",
+  "Guia turístico", "Mecânico", "Motoboy", "Músico para eventos",
+  "Nutricionista esportiva", "Passeador de cachorro", "Piloto de drone",
+  "Redator", "Revisor ortográfico", "Segurança", "Tatuador",
+  "Tradutor", "Vigilante",
+].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
 const subjects = [
   "Alemão", "Árabe", "Arte plástica", "Banca", "Canto", "Ciências", "Crochê", "Educação física", 
