@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { ProfessionalInputLevel } from "@workspace/api-client-react";
-import { ChevronDown, X, MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, X, LocateFixed } from "lucide-react";
+import { getCoordinates, getAddressFromCoords } from "@/lib/api";
 
 const professions = [
   // Música & Artes
@@ -92,17 +93,6 @@ const formSchema = z.object({
   level: z.enum(["amador", "profissional"]),
 });
 
-async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=br&limit=1`;
-    const res = await fetch(url, { headers: { "Accept-Language": "pt-BR" } });
-    const data = await res.json();
-    if (data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const [inputValue, setInputValue] = useState("");
@@ -192,6 +182,24 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   const createProfessional = useCreateProfessional();
   
   const [geocoding, setGeocoding] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const handleUseMyLocation = async () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const addr = await getAddressFromCoords(pos.coords.latitude, pos.coords.longitude);
+        if (addr) form.setValue("address", addr, { shouldValidate: true });
+        setLocating(false);
+      },
+      () => {
+        toast({ variant: "destructive", title: "GPS indisponível", description: "Permita o acesso à localização ou digite o endereço manualmente." });
+        setLocating(false);
+      },
+      { timeout: 10000 }
+    );
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -215,7 +223,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setGeocoding(true);
-    const coords = await geocodeAddress(data.address);
+    const coords = await getCoordinates(data.address);
     setGeocoding(false);
 
     if (!coords) {
@@ -294,10 +302,30 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                   <MapPin className="w-4 h-4 text-primary" />
                   Endereço
                 </FormLabel>
-                <p className="text-xs text-muted-foreground -mt-1">Onde as pessoas vão te encontrar no mapa. Ex: Rua das Flores, 123, Vila Madalena, São Paulo</p>
-                <FormControl>
-                  <Input placeholder="Rua, número, bairro, cidade" className="bg-background" {...field} />
-                </FormControl>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Onde as pessoas vão te encontrar no mapa. Aceita endereço completo ou CEP.
+                </p>
+                <div className="flex gap-2">
+                  <FormControl>
+                    <Input
+                      placeholder="Rua, número, bairro, cidade — ou CEP"
+                      className="bg-background"
+                      {...field}
+                    />
+                  </FormControl>
+                  <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={locating}
+                    title="Usar minha localização"
+                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors"
+                  >
+                    {locating
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <LocateFixed className="w-4 h-4" />
+                    }
+                  </button>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
