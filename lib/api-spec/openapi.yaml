@@ -1,22 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Próximo de Mim API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: professionals
+    description: Professional profiles
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +24,94 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /professionals:
+    get:
+      operationId: listProfessionals
+      tags: [professionals]
+      summary: List all registered professionals
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: Search query
+        - name: lat
+          in: query
+          schema:
+            type: number
+          description: Latitude for proximity search
+        - name: lng
+          in: query
+          schema:
+            type: number
+          description: Longitude for proximity search
+        - name: radiusKm
+          in: query
+          schema:
+            type: number
+          description: Search radius in km (default 1)
+      responses:
+        "200":
+          description: List of professionals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Professional"
+    post:
+      operationId: createProfessional
+      tags: [professionals]
+      summary: Register a new professional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfessionalInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+
+  /professionals/{id}:
+    get:
+      operationId: getProfessional
+      tags: [professionals]
+      summary: Get a professional by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Professional found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+        "404":
+          description: Not found
+
+  /professionals/stats:
+    get:
+      operationId: getProfessionalsStats
+      tags: [professionals]
+      summary: Get platform stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +122,69 @@ components:
       required:
         - status
 
+    Professional:
+      type: object
+      required: [id, name, profession, level, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        linkUrl:
+          type: ["string", "null"]
+        profession:
+          type: string
+        professionDetail:
+          type: ["string", "null"]
+        lessonType:
+          type: ["string", "null"]
+        level:
+          type: string
+          enum: [amador, profissional]
+        lat:
+          type: ["number", "null"]
+        lng:
+          type: ["number", "null"]
+        address:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ProfessionalInput:
+      type: object
+      required: [name, profession, level]
+      properties:
+        name:
+          type: string
+        photoUrl:
+          type: string
+        linkUrl:
+          type: string
+        profession:
+          type: string
+        professionDetail:
+          type: string
+        lessonType:
+          type: string
+        level:
+          type: string
+          enum: [amador, profissional]
+        lat:
+          type: number
+        lng:
+          type: number
+        address:
+          type: string
+
+    PlatformStats:
+      type: object
+      required: [totalProfessionals, totalProfessions]
+      properties:
+        totalProfessionals:
+          type: integer
+        totalProfessions:
+          type: integer
+        recentlyAdded:
+          type: integer
