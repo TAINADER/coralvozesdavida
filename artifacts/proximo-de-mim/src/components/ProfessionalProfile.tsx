@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { getCoordinates, getAddressFromCoords } from "@/lib/api";
+import { getAddressFromCoords, searchAddressSuggestions, AddressSuggestion } from "@/lib/api";
 
 type Platform = { label: string; bg: string; text: string; border: string };
 
@@ -95,6 +95,95 @@ function SkillTagsEdit({ value, onChange }: { value: string[]; onChange: (v: str
   );
 }
 
+function AddressAutocomplete({
+  value,
+  onChange,
+  onSelectCoords,
+  onGps,
+  locating,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onSelectCoords: (coords: { lat: number; lng: number }) => void;
+  onGps: () => void;
+  locating: boolean;
+}) {
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const handleChange = (v: string) => {
+    onChange(v);
+    setConfirmed(false);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (v.trim().length < 4) { setSuggestions([]); setOpen(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      const results = await searchAddressSuggestions(v);
+      setSuggestions(results);
+      setOpen(results.length > 0);
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleSelect = (s: AddressSuggestion) => {
+    onChange(s.displayName);
+    onSelectCoords({ lat: s.lat, lng: s.lng });
+    setSuggestions([]);
+    setOpen(false);
+    setConfirmed(true);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Input
+            value={value}
+            onChange={e => handleChange(e.target.value)}
+            onFocus={() => suggestions.length > 0 && setOpen(true)}
+            placeholder="Rua, número, bairro, cidade — ou CEP"
+            className={`bg-background pr-8 ${confirmed ? "border-green-500 ring-1 ring-green-400" : ""}`}
+            autoComplete="off"
+          />
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              : confirmed ? <Check className="w-4 h-4 text-green-600" />
+              : null}
+          </div>
+        </div>
+        <button type="button" onClick={onGps} disabled={locating} title="Usar minha localização"
+          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors">
+          {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />}
+        </button>
+      </div>
+      {open && suggestions.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl overflow-hidden">
+          {suggestions.map((s, i) => (
+            <button key={i} type="button"
+              onMouseDown={e => { e.preventDefault(); handleSelect(s); }}
+              className="w-full text-left px-4 py-3 text-sm hover:bg-primary/10 transition-colors flex items-start gap-2 border-b border-border/50 last:border-0">
+              <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <span>{s.displayName}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const LEVEL_LABEL: Record<string, string> = { amador: "Amador", profissional: "Profissional" };
 
 export default function ProfessionalProfile({
@@ -130,7 +219,8 @@ export default function ProfessionalProfile({
   const [editSkills, setEditSkills] = useState<string[]>(skills);
   const [editLevel, setEditLevel] = useState(professional.level);
   const [locating, setLocating] = useState(false);
-  const [geocoding, setGeocoding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [preCoords, setPreCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleGps = () => {
     if (!navigator.geolocation) return;
@@ -138,7 +228,10 @@ export default function ProfessionalProfile({
     navigator.geolocation.getCurrentPosition(
       async pos => {
         const addr = await getAddressFromCoords(pos.coords.latitude, pos.coords.longitude);
-        if (addr) setEditAddress(addr);
+        if (addr) {
+          setEditAddress(addr);
+          setPreCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        }
         setLocating(false);
       },
       () => { toast({ variant: "destructive", title: "GPS indisponível" }); setLocating(false); },
@@ -151,11 +244,15 @@ export default function ProfessionalProfile({
       toast({ variant: "destructive", title: "Preencha nome, endereço e ao menos uma habilidade." });
       return;
     }
-    setGeocoding(true);
-    const coords = await getCoordinates(editAddress);
-    setGeocoding(false);
+    let coords = preCoords;
     if (!coords) {
-      toast({ variant: "destructive", title: "Endereço não encontrado", description: "Tente um endereço mais completo, com rua, número e cidade." });
+      setSaving(true);
+      const { getCoordinates } = await import("@/lib/api");
+      coords = await getCoordinates(editAddress);
+      setSaving(false);
+    }
+    if (!coords) {
+      toast({ variant: "destructive", title: "Endereço não encontrado", description: "Selecione uma das sugestões ao digitar, ou tente um endereço mais completo." });
       return;
     }
     updateProf(
@@ -263,15 +360,14 @@ export default function ProfessionalProfile({
                 <label className="text-sm font-bold block mb-1 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-primary" /> Endereço
                 </label>
-                <p className="text-xs text-muted-foreground mb-1">Aceita endereço completo ou CEP.</p>
-                <div className="flex gap-2">
-                  <Input value={editAddress} onChange={e => setEditAddress(e.target.value)}
-                    placeholder="Rua, número, bairro, cidade — ou CEP" className="bg-background" />
-                  <button type="button" onClick={handleGps} disabled={locating}
-                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors">
-                    {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />}
-                  </button>
-                </div>
+                <p className="text-xs text-muted-foreground mb-1">Digite rua, bairro ou CEP e selecione uma das sugestões.</p>
+                <AddressAutocomplete
+                  value={editAddress}
+                  onChange={v => { setEditAddress(v); setPreCoords(null); }}
+                  onSelectCoords={coords => setPreCoords(coords)}
+                  onGps={handleGps}
+                  locating={locating}
+                />
               </div>
 
               <div>
@@ -297,7 +393,7 @@ export default function ProfessionalProfile({
               <div>
                 <label className="text-sm font-bold block mb-2">Nível</label>
                 <div className="flex gap-3">
-                  {["amador", "profissional"].map(l => (
+                  {(["amador", "profissional"] as const).map(l => (
                     <button key={l} type="button" onClick={() => setEditLevel(l)}
                       className={`flex-1 py-2 px-3 rounded-xl border-2 text-sm font-bold transition-all capitalize ${editLevel === l ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:bg-muted"}`}>
                       {LEVEL_LABEL[l]}
@@ -306,8 +402,8 @@ export default function ProfessionalProfile({
                 </div>
               </div>
 
-              <Button className="w-full font-bold" onClick={handleSave} disabled={updatePending || geocoding}>
-                {geocoding ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Localizando endereço...</>
+              <Button className="w-full font-bold" onClick={handleSave} disabled={updatePending || saving}>
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Localizando endereço...</>
                   : updatePending ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Salvando...</>
                   : <><Check className="w-4 h-4 mr-2" />Salvar alterações</>}
               </Button>

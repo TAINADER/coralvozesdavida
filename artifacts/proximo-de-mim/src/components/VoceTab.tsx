@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,8 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { ProfessionalInputLevel } from "@workspace/api-client-react";
-import { MapPin, Loader2, X, LocateFixed } from "lucide-react";
-import { getCoordinates, getAddressFromCoords } from "@/lib/api";
+import { MapPin, Loader2, X, LocateFixed, Check } from "lucide-react";
+import { getCoordinates, getAddressFromCoords, searchAddressSuggestions, AddressSuggestion } from "@/lib/api";
 
 const professions = [
   // Música & Artes
@@ -176,6 +176,108 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
   );
 }
 
+function AddressAutocomplete({
+  value,
+  onChange,
+  onSelectCoords,
+  onGps,
+  locating,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onSelectCoords: (coords: { lat: number; lng: number }) => void;
+  onGps: () => void;
+  locating: boolean;
+}) {
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const handleChange = (v: string) => {
+    onChange(v);
+    setConfirmed(false);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (v.trim().length < 4) { setSuggestions([]); setOpen(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      const results = await searchAddressSuggestions(v);
+      setSuggestions(results);
+      setOpen(results.length > 0);
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleSelect = (s: AddressSuggestion) => {
+    onChange(s.displayName);
+    onSelectCoords({ lat: s.lat, lng: s.lng });
+    setSuggestions([]);
+    setOpen(false);
+    setConfirmed(true);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Input
+            value={value}
+            onChange={e => handleChange(e.target.value)}
+            onFocus={() => suggestions.length > 0 && setOpen(true)}
+            placeholder="Rua, número, bairro, cidade — ou CEP"
+            className={`bg-background pr-8 ${confirmed ? "border-green-500 ring-1 ring-green-400" : ""}`}
+            autoComplete="off"
+          />
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+            {loading
+              ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              : confirmed
+              ? <Check className="w-4 h-4 text-green-600" />
+              : null}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onGps}
+          disabled={locating}
+          title="Usar minha localização"
+          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors"
+        >
+          {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {open && suggestions.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl overflow-hidden">
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              onMouseDown={e => { e.preventDefault(); handleSelect(s); }}
+              className="w-full text-left px-4 py-3 text-sm hover:bg-primary/10 transition-colors flex items-start gap-2 border-b border-border/50 last:border-0"
+            >
+              <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <span>{s.displayName}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat: number; lng: number }, onAdded: () => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -183,6 +285,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   
   const [geocoding, setGeocoding] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [preCoords, setPreCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleUseMyLocation = async () => {
     if (!navigator.geolocation) return;
@@ -190,7 +293,10 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const addr = await getAddressFromCoords(pos.coords.latitude, pos.coords.longitude);
-        if (addr) form.setValue("address", addr, { shouldValidate: true });
+        if (addr) {
+          form.setValue("address", addr, { shouldValidate: true });
+          setPreCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        }
         setLocating(false);
       },
       () => {
@@ -222,15 +328,18 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   const isMedico = selectedSkills.some(s => s.toLowerCase() === "médico" || s.toLowerCase() === "medico");
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setGeocoding(true);
-    const coords = await getCoordinates(data.address);
-    setGeocoding(false);
+    let coords = preCoords;
+    if (!coords) {
+      setGeocoding(true);
+      coords = await getCoordinates(data.address);
+      setGeocoding(false);
+    }
 
     if (!coords) {
       toast({
         variant: "destructive",
         title: "Endereço não encontrado",
-        description: "Tente usar um endereço mais completo, com rua, número e cidade.",
+        description: "Selecione uma das sugestões que aparecem ao digitar, ou tente um endereço mais completo.",
       });
       return;
     }
@@ -303,29 +412,17 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                   Endereço
                 </FormLabel>
                 <p className="text-xs text-muted-foreground -mt-1">
-                  Onde as pessoas vão te encontrar no mapa. Aceita endereço completo ou CEP.
+                  Digite rua, bairro ou CEP e selecione uma das sugestões.
                 </p>
-                <div className="flex gap-2">
-                  <FormControl>
-                    <Input
-                      placeholder="Rua, número, bairro, cidade — ou CEP"
-                      className="bg-background"
-                      {...field}
-                    />
-                  </FormControl>
-                  <button
-                    type="button"
-                    onClick={handleUseMyLocation}
-                    disabled={locating}
-                    title="Usar minha localização"
-                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors"
-                  >
-                    {locating
-                      ? <Loader2 className="w-4 h-4 animate-spin" />
-                      : <LocateFixed className="w-4 h-4" />
-                    }
-                  </button>
-                </div>
+                <FormControl>
+                  <AddressAutocomplete
+                    value={field.value}
+                    onChange={v => { field.onChange(v); setPreCoords(null); }}
+                    onSelectCoords={coords => { setPreCoords(coords); }}
+                    onGps={handleUseMyLocation}
+                    locating={locating}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

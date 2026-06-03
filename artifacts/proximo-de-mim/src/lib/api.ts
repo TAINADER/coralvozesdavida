@@ -28,6 +28,41 @@ async function resolveCep(cep: string): Promise<string | null> {
   }
 }
 
+export interface AddressSuggestion {
+  displayName: string;
+  lat: number;
+  lng: number;
+}
+
+export async function searchAddressSuggestions(query: string): Promise<AddressSuggestion[]> {
+  try {
+    let q = query.trim();
+    if (CEP_REGEX.test(q)) {
+      const resolved = await resolveCep(q);
+      if (resolved) q = resolved;
+    }
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=br&addressdetails=1`,
+      { headers: { "Accept-Language": "pt-BR" } }
+    );
+    const data = await res.json();
+    return (data || []).map((item: any) => {
+      const a = item.address ?? {};
+      const parts = [
+        a.road || a.pedestrian || a.footway || a.suburb,
+        a.house_number,
+        a.suburb || a.neighbourhood || a.quarter,
+        a.city || a.town || a.village || a.municipality,
+        a.state,
+      ].filter(Boolean);
+      const label = parts.length >= 2 ? parts.join(", ") : item.display_name;
+      return { displayName: label, lat: parseFloat(item.lat), lng: parseFloat(item.lon) };
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function getCoordinates(address: string): Promise<{ lat: number; lng: number } | null> {
   try {
     let query = address.trim();
