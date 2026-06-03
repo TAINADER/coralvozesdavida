@@ -29,6 +29,29 @@ export async function getCoordinates(address: string): Promise<{ lat: number; ln
   return null;
 }
 
+export async function getAddressFromCoords(lat: number, lng: number): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    );
+    const data = await res.json();
+    if (data && data.display_name) {
+      const a = data.address;
+      const parts = [
+        a.road || a.pedestrian || a.footway,
+        a.house_number,
+        a.suburb || a.neighbourhood || a.quarter,
+        a.city || a.town || a.village || a.municipality,
+        a.state,
+      ].filter(Boolean);
+      return parts.length > 0 ? parts.join(", ") : data.display_name;
+    }
+  } catch (err) {
+    console.error("Reverse geocoding error:", err);
+  }
+  return null;
+}
+
 export async function getNearbyPlaces(lat: number, lng: number): Promise<OverpassPlace[]> {
   const query = `
     [out:json][timeout:30];

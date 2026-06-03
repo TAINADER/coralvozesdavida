@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, LocateFixed, Loader2 } from "lucide-react";
-import { getCoordinates, getNearbyPlaces } from "@/lib/api";
+import { getCoordinates, getNearbyPlaces, getAddressFromCoords } from "@/lib/api";
 import { useListProfessionals, getListProfessionalsQueryKey } from "@workspace/api-client-react";
 
 export default function Home() {
@@ -26,8 +26,11 @@ export default function Home() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      async (pos) => {
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setLocation(coords);
+        const addr = await getAddressFromCoords(coords.lat, coords.lng);
+        if (addr) setAddress(addr);
         setLocating(false);
       },
       () => {
@@ -64,9 +67,11 @@ export default function Home() {
     if (!navigator.geolocation) return;
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setAddress("");
+      async (pos) => {
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setLocation(coords);
+        const addr = await getAddressFromCoords(coords.lat, coords.lng);
+        if (addr) setAddress(addr);
         setLocating(false);
       },
       () => setLocating(false),
