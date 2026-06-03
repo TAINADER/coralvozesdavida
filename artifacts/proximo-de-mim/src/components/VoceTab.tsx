@@ -136,6 +136,7 @@ function AvailabilityPicker({ value, onChange }: { value: DaySchedule[]; onChang
 }
 
 const formSchema = z.object({
+  skill: z.string().min(1, "Selecione ou digite uma habilidade"),
   name: z.string().min(2, "Nome é obrigatório"),
   address: z.string().min(5, "Endereço é obrigatório"),
   phone: z.string().optional(),
@@ -144,7 +145,6 @@ const formSchema = z.object({
   photoUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   linkUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   availability: z.array(z.object({ day: z.string(), start: z.string(), end: z.string() })).optional(),
-  skills: z.array(z.string()).min(1, "Adicione pelo menos uma habilidade"),
   professionDetail: z.string().optional(),
   lessonType: z.string().optional(),
   level: z.enum(["amador", "profissional"]),
@@ -157,17 +157,17 @@ const formSchema = z.object({
 );
 
 
-function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  const [inputValue, setInputValue] = useState("");
+function SkillInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [inputValue, setInputValue] = useState(value);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fuse = useMemo(() => new Fuse(professions, { threshold: 0.35, includeScore: true }), []);
   const filtered = useMemo(() => {
     const trimmed = inputValue.trim();
-    if (!trimmed) return professions.filter(p => !value.includes(p)).slice(0, 8);
-    return fuse.search(trimmed).map(r => r.item).filter(p => !value.includes(p));
-  }, [inputValue, value, fuse]);
+    if (!trimmed) return professions.slice(0, 8);
+    return fuse.search(trimmed).map(r => r.item);
+  }, [inputValue, fuse]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -179,68 +179,68 @@ function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: strin
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const add = (skill: string) => {
-    const trimmed = skill.trim();
-    if (trimmed && !value.includes(trimmed)) onChange([...value, trimmed]);
-    setInputValue("");
+  const select = (skill: string) => {
+    onChange(skill.trim());
+    setInputValue(skill.trim());
     setOpen(false);
   };
 
-  const remove = (skill: string) => onChange(value.filter(s => s !== skill));
+  const clear = () => {
+    onChange("");
+    setInputValue("");
+  };
+
+  if (value) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-full shadow-sm">
+          {value}
+          <button type="button" onClick={clear} className="hover:opacity-70 transition-opacity ml-0.5">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </span>
+        <span className="text-xs text-muted-foreground italic">clique no × para trocar</span>
+      </div>
+    );
+  }
 
   return (
-    <div ref={containerRef} className="space-y-2">
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {value.map(s => (
-            <span key={s} className="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground text-sm font-semibold rounded-full">
-              {s}
-              <button type="button" onClick={() => remove(s)} className="hover:opacity-70 transition-opacity ml-0.5">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
+    <div ref={containerRef} className="relative">
+      <Input
+        value={inputValue}
+        onChange={e => { setInputValue(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={e => {
+          if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); select(inputValue); }
+          if (e.key === "Escape") setOpen(false);
+        }}
+        placeholder="Ex: Eletricista, Massagista, Dog walker..."
+        className="bg-background"
+        autoComplete="off"
+      />
+      {open && (filtered.length > 0 || inputValue.trim()) && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-52 overflow-y-auto">
+          {filtered.slice(0, 8).map(p => (
+            <button
+              key={p}
+              type="button"
+              onMouseDown={e => { e.preventDefault(); select(p); }}
+              className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 transition-colors"
+            >
+              {p}
+            </button>
           ))}
+          {inputValue.trim() && !professions.some(p => p.toLowerCase() === inputValue.trim().toLowerCase()) && (
+            <button
+              type="button"
+              onMouseDown={e => { e.preventDefault(); select(inputValue.trim()); }}
+              className={`w-full text-left px-4 py-2.5 text-sm text-primary font-semibold hover:bg-primary/10 transition-colors ${filtered.length > 0 ? "border-t border-border" : ""}`}
+            >
+              + Usar "<strong>{inputValue.trim()}</strong>"
+            </button>
+          )}
         </div>
       )}
-      <div className="relative">
-        <Input
-          value={inputValue}
-          onChange={e => { setInputValue(e.target.value); setOpen(e.target.value.trim().length > 0); }}
-          onKeyDown={e => {
-            if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); add(inputValue); }
-            if (e.key === "Escape") setOpen(false);
-          }}
-          placeholder={value.length === 0 ? "Digite uma habilidade e pressione Enter..." : "Adicionar mais..."}
-          className="bg-background"
-          autoComplete="off"
-        />
-        {open && (filtered.length > 0 || inputValue.trim()) && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
-            {filtered.slice(0, 8).map(p => (
-              <button
-                key={p}
-                type="button"
-                onMouseDown={e => { e.preventDefault(); add(p); }}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 transition-colors"
-              >
-                {p}
-              </button>
-            ))}
-            {inputValue.trim() && !professions.some(p => p.toLowerCase() === inputValue.toLowerCase()) && (
-              <button
-                type="button"
-                onMouseDown={e => { e.preventDefault(); add(inputValue.trim()); }}
-                className={`w-full text-left px-4 py-2.5 text-sm text-primary font-semibold hover:bg-primary/10 transition-colors ${filtered.length > 0 ? "border-t border-border" : ""}`}
-              >
-                + Adicionar "<strong>{inputValue.trim()}</strong>"
-              </button>
-            )}
-            {filtered.length === 0 && !inputValue.trim() && (
-              <div className="px-4 py-3 text-sm text-muted-foreground italic">Nenhuma sugestão encontrada.</div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
@@ -379,6 +379,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      skill: "",
       name: "",
       address: "",
       phone: "",
@@ -387,17 +388,16 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
       photoUrl: "",
       linkUrl: "",
       availability: [],
-      skills: [],
       professionDetail: "",
       lessonType: "",
       level: "profissional",
     },
   });
 
-  const selectedSkills = form.watch("skills") ?? [];
-  const isProfessor = selectedSkills.some(s => s.toLowerCase().startsWith("professor"));
-  const isMusico = selectedSkills.some(s => ["músico", "musico", "cantor", "guitarrista", "violonista", "baixista", "baterista", "pianista", "saxofonista", "instrumentista"].some(k => s.toLowerCase().includes(k)));
-  const isMedico = selectedSkills.some(s => s.toLowerCase() === "médico" || s.toLowerCase() === "medico");
+  const selectedSkill = form.watch("skill") ?? "";
+  const isProfessor = selectedSkill.toLowerCase().startsWith("professor");
+  const isMusico = ["músico", "musico", "cantor", "guitarrista", "violonista", "baixista", "baterista", "pianista", "saxofonista", "instrumentista"].some(k => selectedSkill.toLowerCase().includes(k));
+  const isMedico = selectedSkill.toLowerCase() === "médico" || selectedSkill.toLowerCase() === "medico";
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     let coords = preCoords;
@@ -426,8 +426,8 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
         photoUrl: data.photoUrl || undefined,
         linkUrl: data.linkUrl || undefined,
         availability: data.availability && data.availability.length > 0 ? JSON.stringify(data.availability) : undefined,
-        profession: data.skills[0] ?? "",
-        skills: data.skills,
+        profession: data.skill,
+        skills: [data.skill],
         professionDetail: data.professionDetail || undefined,
         lessonType: data.lessonType || undefined,
         level: data.level as ProfessionalInputLevel,
@@ -464,16 +464,18 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
 
       <Form {...form}>
         <form id="voce-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          {/* 1. HABILIDADES — primeiro */}
+          {/* 1. HABILIDADE — uma por vez */}
           <FormField
             control={form.control}
-            name="skills"
+            name="skill"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Suas habilidades</FormLabel>
-                <p className="text-xs text-muted-foreground -mt-1">Ajude as pessoas a poder contar com você!</p>
+                <FormLabel className="font-bold">Qual habilidade você quer cadastrar?</FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Cada cadastro é para uma habilidade. Você pode fazer quantos cadastros quiser — um para cada serviço que oferece.
+                </p>
                 <FormControl>
-                  <SkillsInput value={field.value} onChange={field.onChange} />
+                  <SkillInput value={field.value} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -676,8 +678,12 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
           <FormField control={form.control} name="availability"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Dias e horários de atendimento <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
-                <p className="text-xs text-muted-foreground -mt-1">Selecione os dias e defina os horários em que você atende.</p>
+                <FormLabel className="font-bold">
+                  Dias e horários para esta habilidade <span className="text-muted-foreground font-normal">(opcional)</span>
+                </FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Quando você está disponível especificamente para{selectedSkill ? ` "${selectedSkill}"` : " este serviço"}? Cada habilidade pode ter horários diferentes.
+                </p>
                 <FormControl>
                   <AvailabilityPicker value={field.value ?? []} onChange={field.onChange} />
                 </FormControl>
