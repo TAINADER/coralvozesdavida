@@ -13,15 +13,36 @@ export interface OverpassPlace {
   };
 }
 
+const CEP_REGEX = /^\d{5}-?\d{3}$/;
+
+async function resolveCep(cep: string): Promise<string | null> {
+  try {
+    const clean = cep.replace(/\D/g, "");
+    const res = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
+    const data = await res.json();
+    if (data.erro) return null;
+    const parts = [data.logradouro, data.bairro, data.localidade, data.uf, "Brasil"].filter(Boolean);
+    return parts.join(", ");
+  } catch {
+    return null;
+  }
+}
+
 export async function getCoordinates(address: string): Promise<{ lat: number; lng: number } | null> {
   try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`);
+    let query = address.trim();
+
+    if (CEP_REGEX.test(query)) {
+      const resolved = await resolveCep(query);
+      if (resolved) query = resolved;
+    }
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=br`
+    );
     const data = await res.json();
     if (data && data.length > 0) {
-      return {
-        lat: parseFloat(data[0].lat),
-        lng: parseFloat(data[0].lon)
-      };
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     }
   } catch (err) {
     console.error("Geocoding error:", err);

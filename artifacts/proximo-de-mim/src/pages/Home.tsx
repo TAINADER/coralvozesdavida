@@ -57,7 +57,11 @@ export default function Home() {
     if (!address.trim()) return;
     try {
       const coords = await getCoordinates(address);
-      if (coords) setLocation(coords);
+      if (coords) {
+        setLocation(coords);
+        const resolved = await getAddressFromCoords(coords.lat, coords.lng);
+        if (resolved) setAddress(resolved);
+      }
     } catch (err) {
       console.error(err);
     }
