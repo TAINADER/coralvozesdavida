@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
 import { ProfessionalInputLevel } from "@workspace/api-client-react";
+import { ChevronDown, X } from "lucide-react";
 
 const professions = [
   "Auxiliar de enfermagem", "Baby sitter", "Barista", "Cantor", "Carpinteiro", "Chef de cozinha", 
@@ -38,6 +39,102 @@ const formSchema = z.object({
   lessonType: z.string().optional(),
   level: z.enum(["amador", "profissional"]),
 });
+
+function ProfessionCombobox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [inputValue, setInputValue] = useState(value);
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filtered = inputValue.trim().length === 0
+    ? professions
+    : professions.filter(p => p.toLowerCase().includes(inputValue.toLowerCase()));
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        if (inputValue.trim()) onChange(inputValue.trim());
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [inputValue, onChange]);
+
+  const select = (p: string) => {
+    setInputValue(p);
+    onChange(p);
+    setOpen(false);
+  };
+
+  const clear = () => {
+    setInputValue("");
+    onChange("");
+    setOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="relative flex items-center">
+        <Input
+          value={inputValue}
+          onChange={e => { setInputValue(e.target.value); onChange(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={e => {
+            if (e.key === "Escape") { setOpen(false); (e.target as HTMLInputElement).blur(); }
+            if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); onChange(inputValue.trim()); setOpen(false); }
+          }}
+          placeholder="Digite ou escolha uma profissão..."
+          className="bg-background pr-14"
+          autoComplete="off"
+        />
+        <div className="absolute right-2 flex items-center gap-1">
+          {inputValue && (
+            <button type="button" onClick={clear} className="p-1 text-muted-foreground hover:text-foreground">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button type="button" onClick={() => setOpen(o => !o)} className="p-1 text-muted-foreground hover:text-foreground">
+            <ChevronDown className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-xl shadow-xl max-h-56 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-muted-foreground">
+              Não encontrado — pressione Enter para usar <strong>"{inputValue}"</strong>
+            </div>
+          ) : (
+            filtered.map(p => (
+              <button
+                key={p}
+                type="button"
+                onMouseDown={e => { e.preventDefault(); select(p); }}
+                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-primary/10 transition-colors ${p === value ? "font-bold text-primary bg-primary/5" : ""}`}
+              >
+                {p}
+              </button>
+            ))
+          )}
+          {inputValue.trim() && !professions.some(p => p.toLowerCase() === inputValue.toLowerCase()) && (
+            <button
+              type="button"
+              onMouseDown={e => { e.preventDefault(); select(inputValue.trim()); }}
+              className="w-full text-left px-4 py-2.5 text-sm border-t border-border text-primary font-semibold hover:bg-primary/10 transition-colors"
+            >
+              + Usar "<strong>{inputValue.trim()}</strong>"
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat: number; lng: number }, onAdded: () => void }) {
   const { toast } = useToast();
@@ -165,18 +262,9 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">O que você pode fazer?</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Selecione sua profissão" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {professions.map(p => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <ProfessionCombobox value={field.value} onChange={field.onChange} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
