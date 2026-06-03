@@ -416,11 +416,6 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto pr-2 pb-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-primary mb-2">Cadastrar Serviço</h2>
-        <p className="text-muted-foreground text-sm">Cadastre-se para que as pessoas perto de você possam encontrar seus serviços.</p>
-      </div>
-
       <Form {...form}>
         <form id="voce-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           {/* 1. HABILIDADE — uma por vez */}
