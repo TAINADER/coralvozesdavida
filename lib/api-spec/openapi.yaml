@@ -113,6 +113,31 @@ paths:
                 $ref: "#/components/schemas/Professional"
         "404":
           description: Not found
+    put:
+      operationId: updateProfessional
+      tags: [professionals]
+      summary: Update a professional profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfessionalInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+        "404":
+          description: Not found
 
   /professionals/{id}/reviews:
     get:

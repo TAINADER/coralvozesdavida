@@ -136,6 +136,46 @@ router.get("/professionals/:id", async (req, res) => {
   }
 });
 
+router.put("/professionals/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const [existing] = await db
+      .select({ id: professionalsTable.id })
+      .from(professionalsTable)
+      .where(eq(professionalsTable.id, id));
+    if (!existing) return res.status(404).json({ error: "Not found" });
+
+    const data = req.body;
+    const skills = data.skills as string[] | undefined;
+    const primaryProfession = skills && skills.length > 0 ? skills[0] : (data.profession ?? "");
+
+    const [updated] = await db
+      .update(professionalsTable)
+      .set({
+        name: data.name,
+        address: data.address ?? null,
+        phone: data.phone ?? null,
+        photoUrl: data.photoUrl ?? null,
+        linkUrl: data.linkUrl ?? null,
+        profession: primaryProfession,
+        skills: skills ?? null,
+        professionDetail: data.professionDetail ?? null,
+        lessonType: data.lessonType ?? null,
+        level: data.level,
+        lat: data.lat ?? null,
+        lng: data.lng ?? null,
+      })
+      .where(eq(professionalsTable.id, id))
+      .returning();
+
+    res.json({ ...updated, createdAt: updated.createdAt.toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update professional" });
+  }
+});
+
 router.get("/professionals/:id/reviews", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
