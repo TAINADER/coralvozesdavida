@@ -159,7 +159,7 @@ export default function Home() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
             <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
               <TabsTrigger value="encontre" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">ENCONTRE</TabsTrigger>
-              <TabsTrigger value="voce" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-xs leading-tight">CADASTRE SEU SERVIÇO</TabsTrigger>
+              <TabsTrigger value="voce" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-xs leading-tight">CADASTRAR SERVIÇO</TabsTrigger>
             </TabsList>
             <div className="flex-grow overflow-y-auto p-4 md:p-6">
               <TabsContent value="encontre" className="m-0 h-full">
