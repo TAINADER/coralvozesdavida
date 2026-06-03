@@ -138,7 +138,9 @@ function AvailabilityPicker({ value, onChange }: { value: DaySchedule[]; onChang
 const formSchema = z.object({
   skill: z.string().min(1, "Selecione ou digite uma habilidade"),
   name: z.string().min(2, "Nome é obrigatório"),
-  address: z.string().min(5, "Endereço é obrigatório"),
+  address: z.string()
+    .min(5, "Endereço é obrigatório")
+    .refine(v => /\d/.test(v), { message: "Inclua o número (ex: Rua das Flores, 123 — São Paulo, SP)" }),
   phone: z.string().optional(),
   email: z.string().email("E-mail inválido").optional().or(z.literal("")),
   siteUrl: z.string().url("URL inválida").optional().or(z.literal("")),
@@ -585,7 +587,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                   Endereço
                 </FormLabel>
                 <p className="text-xs text-muted-foreground -mt-1">
-                  Digite rua, bairro ou CEP e selecione uma das sugestões.
+                  Informe rua, número e cidade — ex: <span className="font-medium">Rua das Flores, 123, São Paulo, SP</span>. Selecione uma das sugestões para confirmar.
                 </p>
                 <FormControl>
                   <AddressAutocomplete

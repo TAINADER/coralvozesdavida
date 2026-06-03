@@ -28,7 +28,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("encontre");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | number | null>(null);
-  const [radiusIdx, setRadiusIdx] = useState(3); // default 3km
+  const [radiusIdx, setRadiusIdx] = useState(0); // default 100m
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const queryClient = useQueryClient();
 

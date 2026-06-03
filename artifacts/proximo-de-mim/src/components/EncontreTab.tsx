@@ -102,8 +102,8 @@ export default function EncontreTab({
       .filter(p => p.lat != null && p.lng != null)
       .map(p => ({
         id: p.id,
-        name: p.name,
-        type: p.profession + (p.professionDetail ? ` - ${p.professionDetail}` : ""),
+        name: p.profession + (p.professionDetail ? ` · ${p.professionDetail}` : ""),
+        type: p.name,
         distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat!, p.lng!),
         kind: "professional" as const
       }))
