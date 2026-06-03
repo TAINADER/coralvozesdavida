@@ -34,7 +34,7 @@ router.get("/professionals", async (req, res) => {
   try {
     const parsed = ListProfessionalsQueryParams.safeParse(req.query);
     const params = parsed.success ? parsed.data : {};
-    const { query, lat, lng, radiusKm = 1 } = params;
+    const { query, lat, lng, radiusKm = 3 } = params;
 
     let results = await db.select().from(professionalsTable);
 

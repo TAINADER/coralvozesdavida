@@ -28,8 +28,8 @@ export default function Home() {
   });
 
   const { data: professionals = [], isLoading: isLoadingProfessionals } = useListProfessionals(
-    { lat: location.lat, lng: location.lng, radiusKm: 1 },
-    { query: { queryKey: getListProfessionalsQueryKey({ lat: location.lat, lng: location.lng, radiusKm: 1 }) } }
+    { lat: location.lat, lng: location.lng, radiusKm: 3 },
+    { query: { queryKey: getListProfessionalsQueryKey({ lat: location.lat, lng: location.lng, radiusKm: 3 }) } }
   );
 
   const handleAddressSubmit = async (e: React.FormEvent) => {

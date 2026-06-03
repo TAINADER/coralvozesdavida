@@ -31,12 +31,12 @@ export async function getCoordinates(address: string): Promise<{ lat: number; ln
 
 export async function getNearbyPlaces(lat: number, lng: number): Promise<OverpassPlace[]> {
   const query = `
-    [out:json][timeout:25];
+    [out:json][timeout:30];
     (
-      node["amenity"](around:1000,${lat},${lng});
-      node["shop"](around:1000,${lat},${lng});
-      node["tourism"](around:1000,${lat},${lng});
-      node["leisure"](around:1000,${lat},${lng});
+      node["amenity"](around:3000,${lat},${lng});
+      node["shop"](around:3000,${lat},${lng});
+      node["tourism"](around:3000,${lat},${lng});
+      node["leisure"](around:3000,${lat},${lng});
     );
     out body;
   `;
