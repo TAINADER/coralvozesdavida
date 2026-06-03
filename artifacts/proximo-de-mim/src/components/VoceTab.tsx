@@ -60,7 +60,8 @@ const professions = [
 
   // Alimentação
   "Barista", "Bartender", "Chef de cozinha", "Confeiteiro",
-  "Cozinheiro", "Doceira", "Padeiro", "Sushiman",
+  "Cozinheira de brigadeiro", "Cozinheira de congelados", "Cozinheira de marmita",
+  "Cozinheira de pãozinho", "Cozinheiro", "Doceira", "Boleira", "Padeiro", "Sushiman",
 
   // Serviços & Outros
   "Advogado", "Arquiteto", "Assistente virtual", "Baby sitter",
