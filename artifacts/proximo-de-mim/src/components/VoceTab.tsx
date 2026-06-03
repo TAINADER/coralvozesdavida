@@ -5,7 +5,6 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateProfessional } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -380,14 +379,15 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
   };
 
   return (
-    <div className="h-full overflow-y-auto pr-2 pb-8">
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto pr-2 pb-4">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-primary mb-2">Junte-se à vizinhança</h2>
         <p className="text-muted-foreground text-sm">Cadastre-se para que as pessoas perto de você possam encontrar seus serviços.</p>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <form id="voce-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="name"
@@ -493,17 +493,24 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold">Tipo de aula</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Aula avulsa">Aula avulsa</SelectItem>
-                        <SelectItem value="Aula periódica">Aula periódica</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <div className="flex gap-3">
+                        {["Aula avulsa", "Aula periódica"].map(opt => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => field.onChange(opt)}
+                            className={`flex-1 py-2.5 px-3 rounded-xl border-2 text-sm font-bold transition-all ${
+                              field.value === opt
+                                ? "border-primary bg-primary text-primary-foreground shadow-md"
+                                : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -513,19 +520,25 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
                 name="professionDetail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-bold">Matéria</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue placeholder="Selecione a matéria" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
+                    <FormLabel className="font-bold">Matéria <span className="font-normal text-muted-foreground">(opcional)</span></FormLabel>
+                    <FormControl>
+                      <div className="flex flex-wrap gap-2">
                         {subjects.map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => field.onChange(field.value === s ? "" : s)}
+                            className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+                              field.value === s
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {s}
+                          </button>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -602,21 +615,27 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             )}
           />
 
-          <Button 
-            type="submit" 
-            className="w-full h-14 text-lg font-bold mt-6 shadow-lg hover:shadow-xl transition-all" 
-            disabled={geocoding || createProfessional.isPending}
-          >
-            {geocoding ? (
-              <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Localizando endereço...</span>
-            ) : createProfessional.isPending ? (
-              "Cadastrando..."
-            ) : (
-              "Aparecer no Mapa"
-            )}
-          </Button>
         </form>
       </Form>
+      </div>
+
+      {/* Sticky submit button — always visible at the bottom */}
+      <div className="pt-3 pb-1 border-t border-border bg-background">
+        <Button
+          type="submit"
+          form="voce-form"
+          className="w-full h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
+          disabled={geocoding || createProfessional.isPending}
+        >
+          {geocoding ? (
+            <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Localizando endereço...</span>
+          ) : createProfessional.isPending ? (
+            <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Cadastrando...</span>
+          ) : (
+            "Aparecer no Mapa"
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
