@@ -73,14 +73,15 @@ export async function getAddressFromCoords(lat: number, lng: number): Promise<st
   return null;
 }
 
-export async function getNearbyPlaces(lat: number, lng: number): Promise<OverpassPlace[]> {
+export async function getNearbyPlaces(lat: number, lng: number, radiusMeters = 3000): Promise<OverpassPlace[]> {
+  const r = radiusMeters;
   const query = `
     [out:json][timeout:30];
     (
-      node["amenity"](around:3000,${lat},${lng});
-      node["shop"](around:3000,${lat},${lng});
-      node["tourism"](around:3000,${lat},${lng});
-      node["leisure"](around:3000,${lat},${lng});
+      node["amenity"](around:${r},${lat},${lng});
+      node["shop"](around:${r},${lat},${lng});
+      node["tourism"](around:${r},${lat},${lng});
+      node["leisure"](around:${r},${lat},${lng});
     );
     out body;
   `;

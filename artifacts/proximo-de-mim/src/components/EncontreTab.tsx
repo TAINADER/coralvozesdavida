@@ -12,6 +12,7 @@ interface EncontreTabProps {
   onSelectPlace: (id: string | number) => void;
   userLocation: { lat: number; lng: number };
   isLoadingPlaces?: boolean;
+  radiusKm: number;
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -34,7 +35,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-export default function EncontreTab({ searchQuery, setSearchQuery, places, professionals, onSelectPlace, userLocation, isLoadingPlaces }: EncontreTabProps) {
+export default function EncontreTab({ searchQuery, setSearchQuery, places, professionals, onSelectPlace, userLocation, isLoadingPlaces, radiusKm }: EncontreTabProps) {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   const filteredPlaces = places.filter(p => {
@@ -62,8 +63,6 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
     kind: "place" | "professional";
   };
 
-  const MAX_KM = 3;
-
   const listItems: ListItem[] = [
     ...filteredPlaces
       .map(p => ({
@@ -73,7 +72,7 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
         distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lon),
         kind: "place" as const
       }))
-      .filter(p => p.distance <= MAX_KM),
+      .filter(p => p.distance <= radiusKm),
     ...filteredProfessionals
       .filter(p => p.lat != null && p.lng != null)
       .map(p => ({
@@ -83,7 +82,7 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
         distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat!, p.lng!),
         kind: "professional" as const
       }))
-      .filter(p => p.distance <= MAX_KM)
+      .filter(p => p.distance <= radiusKm)
   ].sort((a, b) => a.distance - b.distance);
 
   return (
@@ -106,8 +105,10 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
           </div>
         ) : listItems.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p className="font-semibold">Nada encontrado nos 3km ao redor.</p>
-            <p className="text-sm mt-1">Tente outro termo ou verifique seu endereço.</p>
+            <p className="font-semibold">
+              Nada encontrado nos {radiusKm < 1 ? `${radiusKm * 1000}m` : `${radiusKm}km`} ao redor.
+            </p>
+            <p className="text-sm mt-1">Tente aumentar o raio ou verifique seu endereço.</p>
           </div>
         ) : (
           listItems.map(item => (

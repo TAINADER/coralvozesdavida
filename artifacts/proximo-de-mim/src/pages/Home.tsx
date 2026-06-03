@@ -10,6 +10,14 @@ import { MapPin, LocateFixed, Loader2 } from "lucide-react";
 import { getCoordinates, getNearbyPlaces, getAddressFromCoords } from "@/lib/api";
 import { useListProfessionals, getListProfessionalsQueryKey } from "@workspace/api-client-react";
 
+const RADIUS_OPTIONS = [
+  { label: "100m",  meters: 100,   km: 0.1, zoom: 17 },
+  { label: "1km",   meters: 1000,  km: 1,   zoom: 15 },
+  { label: "2km",   meters: 2000,  km: 2,   zoom: 14 },
+  { label: "3km",   meters: 3000,  km: 3,   zoom: 13 },
+  { label: "10km",  meters: 10000, km: 10,  zoom: 12 },
+];
+
 export default function Home() {
   const [address, setAddress] = useState("");
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -17,7 +25,10 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("encontre");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | number | null>(null);
+  const [radiusIdx, setRadiusIdx] = useState(3); // default 3km
   const queryClient = useQueryClient();
+
+  const radius = RADIUS_OPTIONS[radiusIdx];
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -42,14 +53,14 @@ export default function Home() {
   }, []);
 
   const { data: overpassPlaces = [], isLoading: isLoadingPlaces } = useQuery({
-    queryKey: ["overpass", location?.lat, location?.lng],
-    queryFn: () => getNearbyPlaces(location!.lat, location!.lng),
+    queryKey: ["overpass", location?.lat, location?.lng, radius.meters],
+    queryFn: () => getNearbyPlaces(location!.lat, location!.lng, radius.meters),
     enabled: !!location,
   });
 
   const { data: professionals = [] } = useListProfessionals(
-    { lat: location?.lat, lng: location?.lng, radiusKm: 3 },
-    { query: { enabled: !!location, queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: 3 }) } }
+    { lat: location?.lat, lng: location?.lng, radiusKm: radius.km },
+    { query: { enabled: !!location, queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: radius.km }) } }
   );
 
   const handleAddressSubmit = async (e: React.FormEvent) => {
@@ -99,25 +110,35 @@ export default function Home() {
                   id="address-input"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Digite seu endereço ou bairro..."
+                  placeholder="Endereço, bairro ou CEP..."
                   className="pl-10 bg-white text-black border-none focus-visible:ring-2 focus-visible:ring-accent shadow-sm"
                 />
               </div>
-              <Button type="submit" variant="secondary" className="font-bold">
-                Buscar
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleUseMyLocation}
-                disabled={locating}
-                className="font-bold px-3"
-                title="Usar minha localização"
-              >
+              <Button type="submit" variant="secondary" className="font-bold">Buscar</Button>
+              <Button type="button" variant="secondary" onClick={handleUseMyLocation} disabled={locating} className="px-3" title="Usar minha localização">
                 {locating ? <Loader2 className="w-5 h-5 animate-spin" /> : <LocateFixed className="w-5 h-5" />}
               </Button>
             </div>
           </form>
+
+          {/* Radius selector */}
+          <div className="mt-4 flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold opacity-80">Raio de busca:</span>
+            {RADIUS_OPTIONS.map((opt, idx) => (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setRadiusIdx(idx)}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition-all border ${
+                  idx === radiusIdx
+                    ? "bg-white text-primary border-white shadow"
+                    : "bg-primary/20 text-primary-foreground border-white/30 hover:bg-white/20"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -132,6 +153,7 @@ export default function Home() {
             {location && (
               <MapComponent
                 location={location}
+                zoom={radius.zoom}
                 places={overpassPlaces}
                 professionals={professionals}
                 selectedPlaceId={selectedPlaceId}
@@ -145,7 +167,6 @@ export default function Home() {
                 <TabsTrigger value="encontre" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">ENCONTRE</TabsTrigger>
                 <TabsTrigger value="voce" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">VOCÊ</TabsTrigger>
               </TabsList>
-
               <div className="flex-grow overflow-y-auto p-4 md:p-6">
                 <TabsContent value="encontre" className="m-0 h-full">
                   <EncontreTab
@@ -156,13 +177,14 @@ export default function Home() {
                     onSelectPlace={(id) => setSelectedPlaceId(id)}
                     userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
                     isLoadingPlaces={isLoadingPlaces}
+                    radiusKm={radius.km}
                   />
                 </TabsContent>
                 <TabsContent value="voce" className="m-0 h-full">
                   <VoceTab
                     userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
                     onAdded={() => {
-                      queryClient.invalidateQueries({ queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: 3 }) });
+                      queryClient.invalidateQueries({ queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: radius.km }) });
                     }}
                   />
                 </TabsContent>
