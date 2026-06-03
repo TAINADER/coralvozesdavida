@@ -94,6 +94,7 @@ const formSchema = z.object({
   photoUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   linkUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   availability: z.array(z.object({ day: z.string(), start: z.string(), end: z.string() })).optional(),
+  bio: z.string().max(200, "Máximo 200 caracteres").optional(),
   professionDetail: z.string().optional(),
   lessonType: z.string().optional(),
   level: z.enum(["amador", "profissional"]),
@@ -344,6 +345,7 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
       photoUrl: "",
       linkUrl: "",
       availability: [],
+      bio: "",
       professionDetail: "",
       lessonType: "",
       level: "profissional",
@@ -384,6 +386,7 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
         availability: data.availability && data.availability.length > 0 ? JSON.stringify(data.availability) : undefined,
         profession: data.skill,
         skills: [data.skill],
+        bio: (data as any).bio || undefined,
         professionDetail: data.professionDetail || undefined,
         lessonType: data.lessonType || undefined,
         level: data.level as ProfessionalInputLevel,
@@ -525,7 +528,27 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
               <FormItem>
                 <FormLabel className="font-bold">Nome</FormLabel>
                 <FormControl>
-                  <Input placeholder="Seu nome completo" className="bg-background" {...field} />
+                  <Input placeholder="Seu nome" className="bg-background" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* 2b. BIO */}
+          <FormField control={form.control} name="bio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Apresentação <span className="font-normal text-muted-foreground">(opcional)</span></FormLabel>
+                <p className="text-xs text-muted-foreground -mt-1">Descreva em duas linhas seu negócio/serviço — se apresente!</p>
+                <FormControl>
+                  <textarea
+                    {...field}
+                    rows={2}
+                    maxLength={200}
+                    placeholder="Ex: Sou eletricista com 10 anos de experiência, atendo residências e comércios no bairro..."
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -695,7 +718,7 @@ export default function VoceTab({ userLocation, onAdded, professionals = [], onE
           ) : createProfessional.isPending ? (
             <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Cadastrando...</span>
           ) : (
-            "Aparecer no Mapa"
+            "Cadastrar Serviço"
           )}
         </Button>
 
