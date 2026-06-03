@@ -140,8 +140,8 @@ export default function EncontreTab({
               Nada encontrado nos {fmtRadius(radiusKm)} ao redor.
             </p>
             {canExpand && (
-              <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-sm font-semibold text-amber-800 mb-3 flex items-center gap-1">
+              <div className="w-full bg-muted/50 border border-border rounded-xl p-4">
+                <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-1">
                   <ZoomOut className="w-4 h-4" />
                   Quer ampliar o raio de busca?
                 </p>
@@ -150,7 +150,7 @@ export default function EncontreTab({
                     <button
                       key={opt.label}
                       onClick={() => setRadiusIdx(radiusIdx + 1 + i)}
-                      className="flex items-center gap-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-full transition-all shadow-sm"
+                      className="flex items-center gap-1 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground text-sm font-semibold rounded-full border border-border transition-all"
                     >
                       Ampliar para {opt.label}
                       <ChevronRight className="w-3 h-3" />
@@ -197,18 +197,18 @@ export default function EncontreTab({
                   }}
                   className={`w-full text-left p-4 rounded-xl border transition-all duration-200 hover:shadow-md flex items-start gap-4 ${
                     item.kind === 'professional'
-                      ? 'bg-orange-50 hover:bg-orange-100 border-orange-200'
+                      ? 'bg-teal-50 hover:bg-teal-100 border-teal-200'
                       : 'bg-background hover:bg-muted/50 border-border'
                   }`}
                 >
-                  <div className={`p-3 rounded-full ${item.kind === 'professional' ? 'bg-orange-200 text-orange-800' : 'bg-primary/10 text-primary'}`}>
+                  <div className={`p-3 rounded-full ${item.kind === 'professional' ? 'bg-teal-200 text-teal-800' : 'bg-primary/10 text-primary'}`}>
                     {item.kind === 'professional' ? <User className="w-5 h-5" /> : <Store className="w-5 h-5" />}
                   </div>
                   <div className="flex-grow min-w-0">
                     <h3 className="font-bold text-base leading-tight text-foreground">{item.name}</h3>
                     <p className="text-sm text-muted-foreground capitalize mt-0.5">{item.type}</p>
                     {item.kind === 'professional' && (
-                      <span className="inline-flex items-center gap-1 mt-1 text-xs text-orange-700 font-semibold">
+                      <span className="inline-flex items-center gap-1 mt-1 text-xs text-teal-700 font-semibold">
                         <Star className="w-3 h-3" /> Ver perfil e avaliações
                       </span>
                     )}
