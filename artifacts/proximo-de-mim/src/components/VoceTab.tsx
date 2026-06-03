@@ -148,7 +148,13 @@ const formSchema = z.object({
   professionDetail: z.string().optional(),
   lessonType: z.string().optional(),
   level: z.enum(["amador", "profissional"]),
-});
+}).refine(
+  (data) => [data.phone, data.email, data.siteUrl, data.linkUrl].some(v => v && v.trim() !== ""),
+  {
+    message: "Preencha pelo menos uma forma de contato (telefone, e-mail, site ou redes sociais)",
+    path: ["phone"],
+  }
+);
 
 
 function SkillsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
@@ -593,6 +599,13 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
             )}
           />
 
+          {/* CONTATO */}
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 pt-4 pb-1 space-y-4">
+            <div>
+              <p className="text-sm font-bold text-amber-800">Forneça pelo menos uma das opções abaixo</p>
+              <p className="text-xs text-amber-700 mt-0.5">Telefone, e-mail, site ou redes sociais — para as pessoas conseguirem entrar em contato com você.</p>
+            </div>
+
           {/* 4. TELEFONE */}
           <FormField control={form.control} name="phone"
             render={({ field }) => (
@@ -644,6 +657,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
               </FormItem>
             )}
           />
+          </div>
 
           {/* 8. FOTO */}
           <FormField control={form.control} name="photoUrl"
