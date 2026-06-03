@@ -10,7 +10,7 @@ import { useCreateProfessional } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListProfessionalsQueryKey } from "@workspace/api-client-react";
-import { ProfessionalInputLevel } from "@workspace/api-client-react/src/generated/api.schemas";
+import { ProfessionalInputLevel } from "@workspace/api-client-react";
 
 const professions = [
   "Auxiliar de enfermagem", "Baby sitter", "Barista", "Cantor", "Carpinteiro", "Chef de cozinha", 

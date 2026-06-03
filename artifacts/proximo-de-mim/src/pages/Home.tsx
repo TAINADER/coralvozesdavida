@@ -1,35 +1,52 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import MapComponent from "@/components/MapComponent";
 import EncontreTab from "@/components/EncontreTab";
 import VoceTab from "@/components/VoceTab";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, MapPin } from "lucide-react";
-import { getCoordinates, getNearbyPlaces, OverpassPlace } from "@/lib/api";
+import { MapPin, LocateFixed, Loader2 } from "lucide-react";
+import { getCoordinates, getNearbyPlaces } from "@/lib/api";
 import { useListProfessionals, getListProfessionalsQueryKey } from "@workspace/api-client-react";
 
 export default function Home() {
   const [address, setAddress] = useState("");
-  const [location, setLocation] = useState<{ lat: number; lng: number }>({
-    lat: -23.5505,
-    lng: -46.6333,
-  }); // Default SP
-  
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(true);
   const [activeTab, setActiveTab] = useState("encontre");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | number | null>(null);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocation({ lat: -23.5505, lng: -46.6333 });
+      setLocating(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocating(false);
+      },
+      () => {
+        setLocation({ lat: -23.5505, lng: -46.6333 });
+        setLocating(false);
+      },
+      { timeout: 8000 }
+    );
+  }, []);
 
   const { data: overpassPlaces = [], isLoading: isLoadingPlaces } = useQuery({
-    queryKey: ["overpass", location.lat, location.lng],
-    queryFn: () => getNearbyPlaces(location.lat, location.lng),
+    queryKey: ["overpass", location?.lat, location?.lng],
+    queryFn: () => getNearbyPlaces(location!.lat, location!.lng),
     enabled: !!location,
   });
 
-  const { data: professionals = [], isLoading: isLoadingProfessionals } = useListProfessionals(
-    { lat: location.lat, lng: location.lng, radiusKm: 3 },
-    { query: { queryKey: getListProfessionalsQueryKey({ lat: location.lat, lng: location.lng, radiusKm: 3 }) } }
+  const { data: professionals = [] } = useListProfessionals(
+    { lat: location?.lat, lng: location?.lng, radiusKm: 3 },
+    { query: { enabled: !!location, queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: 3 }) } }
   );
 
   const handleAddressSubmit = async (e: React.FormEvent) => {
@@ -37,12 +54,24 @@ export default function Home() {
     if (!address.trim()) return;
     try {
       const coords = await getCoordinates(address);
-      if (coords) {
-        setLocation(coords);
-      }
+      if (coords) setLocation(coords);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setAddress("");
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { timeout: 8000 }
+    );
   };
 
   return (
@@ -50,7 +79,7 @@ export default function Home() {
       <header className="bg-primary text-primary-foreground p-6 shadow-md z-10 relative">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-extrabold tracking-tight mb-4">PRÓXIMO DE MIM</h1>
-          <form onSubmit={handleAddressSubmit} className="relative group">
+          <form onSubmit={handleAddressSubmit}>
             <label htmlFor="address-input" className="block text-sm font-semibold mb-2 opacity-90">
               ONDE VOCÊ ESTÁ?
             </label>
@@ -68,46 +97,71 @@ export default function Home() {
               <Button type="submit" variant="secondary" className="font-bold">
                 Buscar
               </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleUseMyLocation}
+                disabled={locating}
+                className="font-bold px-3"
+                title="Usar minha localização"
+              >
+                {locating ? <Loader2 className="w-5 h-5 animate-spin" /> : <LocateFixed className="w-5 h-5" />}
+              </Button>
             </div>
           </form>
         </div>
       </header>
 
-      <div className="flex-grow flex flex-col md:flex-row w-full max-w-7xl mx-auto bg-card shadow-xl overflow-hidden md:my-6 md:rounded-2xl">
-        <div className="w-full md:w-1/2 h-[400px] md:h-auto min-h-[400px] relative border-b md:border-b-0 md:border-r border-border">
-          <MapComponent
-            location={location}
-            places={overpassPlaces}
-            professionals={professionals}
-            selectedPlaceId={selectedPlaceId}
-          />
+      {locating ? (
+        <div className="flex-grow flex flex-col items-center justify-center gap-4 text-muted-foreground">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <p className="text-lg font-semibold">Detectando sua localização...</p>
         </div>
+      ) : (
+        <div className="flex-grow flex flex-col md:flex-row w-full max-w-7xl mx-auto bg-card shadow-xl overflow-hidden md:my-6 md:rounded-2xl">
+          <div className="w-full md:w-1/2 h-[400px] md:h-auto min-h-[400px] relative border-b md:border-b-0 md:border-r border-border">
+            {location && (
+              <MapComponent
+                location={location}
+                places={overpassPlaces}
+                professionals={professionals}
+                selectedPlaceId={selectedPlaceId}
+              />
+            )}
+          </div>
 
-        <div className="w-full md:w-1/2 flex flex-col h-full bg-sidebar">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
-            <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
-              <TabsTrigger value="encontre" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">ENCONTRE</TabsTrigger>
-              <TabsTrigger value="voce" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">VOCÊ</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex-grow overflow-y-auto p-4 md:p-6">
-              <TabsContent value="encontre" className="m-0 h-full">
-                <EncontreTab 
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  places={overpassPlaces}
-                  professionals={professionals}
-                  onSelectPlace={(id) => setSelectedPlaceId(id)}
-                  userLocation={location}
-                />
-              </TabsContent>
-              <TabsContent value="voce" className="m-0 h-full">
-                <VoceTab userLocation={location} onAdded={() => {}} />
-              </TabsContent>
-            </div>
-          </Tabs>
+          <div className="w-full md:w-1/2 flex flex-col h-full bg-sidebar">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
+              <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
+                <TabsTrigger value="encontre" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">ENCONTRE</TabsTrigger>
+                <TabsTrigger value="voce" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-sm">VOCÊ</TabsTrigger>
+              </TabsList>
+
+              <div className="flex-grow overflow-y-auto p-4 md:p-6">
+                <TabsContent value="encontre" className="m-0 h-full">
+                  <EncontreTab
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    places={overpassPlaces}
+                    professionals={professionals}
+                    onSelectPlace={(id) => setSelectedPlaceId(id)}
+                    userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
+                    isLoadingPlaces={isLoadingPlaces}
+                  />
+                </TabsContent>
+                <TabsContent value="voce" className="m-0 h-full">
+                  <VoceTab
+                    userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
+                    onAdded={() => {
+                      queryClient.invalidateQueries({ queryKey: getListProfessionalsQueryKey({ lat: location?.lat, lng: location?.lng, radiusKm: 3 }) });
+                    }}
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

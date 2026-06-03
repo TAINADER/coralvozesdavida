@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { OverpassPlace } from "@/lib/api";
 import { Professional } from "@workspace/api-client-react";
-import { Search, MapPin, Store, User } from "lucide-react";
+import { Search, MapPin, Store, User, Loader2 } from "lucide-react";
 
 interface EncontreTabProps {
   searchQuery: string;
@@ -11,6 +11,7 @@ interface EncontreTabProps {
   professionals: Professional[];
   onSelectPlace: (id: string | number) => void;
   userLocation: { lat: number; lng: number };
+  isLoadingPlaces?: boolean;
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -33,7 +34,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-export default function EncontreTab({ searchQuery, setSearchQuery, places, professionals, onSelectPlace, userLocation }: EncontreTabProps) {
+export default function EncontreTab({ searchQuery, setSearchQuery, places, professionals, onSelectPlace, userLocation, isLoadingPlaces }: EncontreTabProps) {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   const filteredPlaces = places.filter(p => {
@@ -91,7 +92,12 @@ export default function EncontreTab({ searchQuery, setSearchQuery, places, profe
       </div>
 
       <div className="flex-grow overflow-y-auto pr-2 space-y-3">
-        {listItems.length === 0 ? (
+        {isLoadingPlaces ? (
+          <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm">Carregando estabelecimentos próximos...</p>
+          </div>
+        ) : listItems.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <p>Nenhum resultado encontrado para a busca.</p>
           </div>
