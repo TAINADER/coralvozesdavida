@@ -178,6 +178,8 @@ export default function Home() {
                     userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
                     isLoadingPlaces={isLoadingPlaces}
                     radiusKm={radius.km}
+                    radiusIdx={radiusIdx}
+                    setRadiusIdx={setRadiusIdx}
                   />
                 </TabsContent>
                 <TabsContent value="voce" className="m-0 h-full">
