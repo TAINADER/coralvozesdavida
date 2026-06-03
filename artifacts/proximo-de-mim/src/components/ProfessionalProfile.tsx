@@ -7,6 +7,52 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
+type Platform = { label: string; bg: string; text: string; border: string; logo: string };
+
+function detectPlatform(url: string): Platform {
+  const u = url.toLowerCase();
+  if (u.includes("instagram.com"))
+    return { label: "Instagram", bg: "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400", text: "text-white", border: "border-pink-300", logo: "📸" };
+  if (u.includes("youtube.com") || u.includes("youtu.be"))
+    return { label: "YouTube", bg: "bg-red-600", text: "text-white", border: "border-red-400", logo: "▶️" };
+  if (u.includes("whatsapp.com") || u.includes("wa.me"))
+    return { label: "WhatsApp", bg: "bg-green-500", text: "text-white", border: "border-green-300", logo: "💬" };
+  if (u.includes("linkedin.com"))
+    return { label: "LinkedIn", bg: "bg-blue-700", text: "text-white", border: "border-blue-400", logo: "💼" };
+  if (u.includes("facebook.com") || u.includes("fb.com"))
+    return { label: "Facebook", bg: "bg-blue-600", text: "text-white", border: "border-blue-300", logo: "👥" };
+  if (u.includes("tiktok.com"))
+    return { label: "TikTok", bg: "bg-black", text: "text-white", border: "border-gray-600", logo: "🎵" };
+  if (u.includes("twitter.com") || u.includes("x.com"))
+    return { label: "X / Twitter", bg: "bg-black", text: "text-white", border: "border-gray-500", logo: "✖" };
+  return { label: "Site", bg: "bg-teal-700", text: "text-white", border: "border-teal-400", logo: "🌐" };
+}
+
+function LinkPreviewCard({ url }: { url: string }) {
+  const platform = detectPlatform(url);
+  const domain = url.replace(/^https?:\/\//, "").replace(/\/$/, "").split("/")[0];
+  const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  const displayPath = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="block group">
+      <div className={`rounded-xl border ${platform.border} ${platform.bg} ${platform.text} px-4 py-3 flex items-center gap-3 shadow-sm hover:opacity-90 transition-opacity`}>
+        <img
+          src={favicon}
+          alt=""
+          className="w-8 h-8 rounded-lg bg-white/20 p-0.5 object-contain shrink-0"
+          onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="font-bold text-sm">{platform.label}</div>
+          <div className="text-xs opacity-80 truncate">{displayPath}</div>
+        </div>
+        <ExternalLink className="w-4 h-4 opacity-60 shrink-0" />
+      </div>
+    </a>
+  );
+}
+
 const LEVEL_LABEL: Record<string, string> = {
   amador: "Amador",
   profissional: "Profissional",
@@ -126,15 +172,7 @@ export default function ProfessionalProfile({ professional, onClose }: { profess
             </a>
           )}
           {professional.linkUrl && (
-            <a
-              href={professional.linkUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 text-sm text-teal-700 font-semibold hover:underline"
-            >
-              <ExternalLink className="w-4 h-4" />
-              {professional.linkUrl.replace(/^https?:\/\//, "")}
-            </a>
+            <LinkPreviewCard url={professional.linkUrl} />
           )}
 
           {/* Divider */}
