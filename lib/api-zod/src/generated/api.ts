@@ -61,6 +61,16 @@ export const CreateProfessionalBody = zod.object({
 
 
 /**
+ * @summary Get platform stats
+ */
+export const GetProfessionalsStatsResponse = zod.object({
+  "totalProfessionals": zod.number(),
+  "totalProfessions": zod.number(),
+  "recentlyAdded": zod.number().optional()
+})
+
+
+/**
  * @summary Get a professional by ID
  */
 export const GetProfessionalParams = zod.object({
@@ -84,12 +94,42 @@ export const GetProfessionalResponse = zod.object({
 
 
 /**
- * @summary Get platform stats
+ * @summary List reviews for a professional
  */
-export const GetProfessionalsStatsResponse = zod.object({
-  "totalProfessionals": zod.number(),
-  "totalProfessions": zod.number(),
-  "recentlyAdded": zod.number().optional()
+export const ListReviewsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const listReviewsResponseRatingMax = 5;
+
+
+
+export const ListReviewsResponseItem = zod.object({
+  "id": zod.number(),
+  "professionalId": zod.number(),
+  "reviewerName": zod.string(),
+  "rating": zod.number().min(1).max(listReviewsResponseRatingMax),
+  "comment": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListReviewsResponse = zod.array(ListReviewsResponseItem)
+
+
+/**
+ * @summary Submit a review for a professional
+ */
+export const CreateReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const createReviewBodyRatingMax = 5;
+
+
+
+export const CreateReviewBody = zod.object({
+  "reviewerName": zod.string().optional(),
+  "rating": zod.number().min(1).max(createReviewBodyRatingMax),
+  "comment": zod.string().optional()
 })
 
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { OverpassPlace } from "@/lib/api";
 import { Professional } from "@workspace/api-client-react";
-import { Search, MapPin, Store, User, Loader2, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { Search, MapPin, Store, User, Loader2, ChevronRight, ZoomIn, ZoomOut, Star } from "lucide-react";
 
 const RADIUS_OPTIONS = [
   { label: "100m",  meters: 100,   km: 0.1 },
@@ -20,6 +20,7 @@ interface EncontreTabProps {
   places: OverpassPlace[];
   professionals: Professional[];
   onSelectPlace: (id: string | number) => void;
+  onViewProfile: (prof: Professional) => void;
   userLocation: { lat: number; lng: number };
   isLoadingPlaces?: boolean;
   radiusKm: number;
@@ -52,7 +53,7 @@ function fmtRadius(km: number) {
 
 export default function EncontreTab({
   searchQuery, setSearchQuery, places, professionals,
-  onSelectPlace, userLocation, isLoadingPlaces,
+  onSelectPlace, onViewProfile, userLocation, isLoadingPlaces,
   radiusKm, radiusIdx, setRadiusIdx
 }: EncontreTabProps) {
   const debouncedSearch = useDebounce(searchQuery, 300);
@@ -174,31 +175,48 @@ export default function EncontreTab({
               </div>
             )}
 
-            {listItems.map(item => (
-              <button
-                key={`${item.kind}-${item.id}`}
-                onClick={() => onSelectPlace(item.id)}
-                className={`w-full text-left p-4 rounded-xl border transition-all duration-200 hover:shadow-md flex items-start gap-4 ${
-                  item.kind === 'professional'
-                    ? 'bg-secondary/5 hover:bg-secondary/10 border-secondary/20'
-                    : 'bg-background hover:bg-muted/50 border-border'
-                }`}
-              >
-                <div className={`p-3 rounded-full ${item.kind === 'professional' ? 'bg-secondary/20 text-secondary-foreground' : 'bg-primary/10 text-primary'}`}>
-                  {item.kind === 'professional' ? <User className="w-5 h-5" /> : <Store className="w-5 h-5" />}
-                </div>
-                <div className="flex-grow">
-                  <h3 className="font-bold text-lg leading-tight text-foreground">{item.name}</h3>
-                  <p className="text-sm text-muted-foreground capitalize mt-1">{item.type}</p>
-                </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded">
-                  <MapPin className="w-3 h-3" />
-                  <span>
-                    {item.distance < 1 ? `${Math.round(item.distance * 1000)}m` : `${item.distance.toFixed(1)}km`}
-                  </span>
-                </div>
-              </button>
-            ))}
+            {listItems.map(item => {
+              const prof = item.kind === "professional"
+                ? professionals.find(p => p.id === item.id)
+                : null;
+
+              return (
+                <button
+                  key={`${item.kind}-${item.id}`}
+                  onClick={() => {
+                    if (prof) {
+                      onViewProfile(prof);
+                    } else {
+                      onSelectPlace(item.id);
+                    }
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border transition-all duration-200 hover:shadow-md flex items-start gap-4 ${
+                    item.kind === 'professional'
+                      ? 'bg-orange-50 hover:bg-orange-100 border-orange-200'
+                      : 'bg-background hover:bg-muted/50 border-border'
+                  }`}
+                >
+                  <div className={`p-3 rounded-full ${item.kind === 'professional' ? 'bg-orange-200 text-orange-800' : 'bg-primary/10 text-primary'}`}>
+                    {item.kind === 'professional' ? <User className="w-5 h-5" /> : <Store className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h3 className="font-bold text-base leading-tight text-foreground">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground capitalize mt-0.5">{item.type}</p>
+                    {item.kind === 'professional' && (
+                      <span className="inline-flex items-center gap-1 mt-1 text-xs text-orange-700 font-semibold">
+                        <Star className="w-3 h-3" /> Ver perfil e avaliações
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-xs font-semibold text-muted-foreground bg-muted px-2 py-1 rounded shrink-0">
+                    <MapPin className="w-3 h-3" />
+                    <span>
+                      {item.distance < 1 ? `${Math.round(item.distance * 1000)}m` : `${item.distance.toFixed(1)}km`}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </>
         )}
       </div>

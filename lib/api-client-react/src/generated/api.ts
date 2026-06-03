@@ -24,7 +24,9 @@ import type {
   ListProfessionalsParams,
   PlatformStats,
   Professional,
-  ProfessionalInput
+  ProfessionalInput,
+  Review,
+  ReviewInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -271,6 +273,83 @@ export const useCreateProfessional = <TError = ErrorType<unknown>,
       return useMutation(getCreateProfessionalMutationOptions(options));
     }
 
+export const getGetProfessionalsStatsUrl = () => {
+
+
+
+
+  return `/api/professionals/stats`
+}
+
+/**
+ * @summary Get platform stats
+ */
+export const getProfessionalsStats = async ( options?: RequestInit): Promise<PlatformStats> => {
+
+  return customFetch<PlatformStats>(getGetProfessionalsStatsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProfessionalsStatsQueryKey = () => {
+    return [
+    `/api/professionals/stats`
+    ] as const;
+    }
+
+
+export const getGetProfessionalsStatsQueryOptions = <TData = Awaited<ReturnType<typeof getProfessionalsStats>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProfessionalsStatsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProfessionalsStats>>> = ({ signal }) => getProfessionalsStats({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetProfessionalsStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getProfessionalsStats>>>
+export type GetProfessionalsStatsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get platform stats
+ */
+
+export function useGetProfessionalsStats<TData = Awaited<ReturnType<typeof getProfessionalsStats>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetProfessionalsStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export const getGetProfessionalUrl = (id: number,) => {
 
 
@@ -348,20 +427,20 @@ export function useGetProfessional<TData = Awaited<ReturnType<typeof getProfessi
 
 
 
-export const getGetProfessionalsStatsUrl = () => {
+export const getListReviewsUrl = (id: number,) => {
 
 
 
 
-  return `/api/professionals/stats`
+  return `/api/professionals/${id}/reviews`
 }
 
 /**
- * @summary Get platform stats
+ * @summary List reviews for a professional
  */
-export const getProfessionalsStats = async ( options?: RequestInit): Promise<PlatformStats> => {
+export const listReviews = async (id: number, options?: RequestInit): Promise<Review[]> => {
 
-  return customFetch<PlatformStats>(getGetProfessionalsStatsUrl(),
+  return customFetch<Review[]>(getListReviewsUrl(id),
   {
     ...options,
     method: 'GET'
@@ -374,45 +453,45 @@ export const getProfessionalsStats = async ( options?: RequestInit): Promise<Pla
 
 
 
-export const getGetProfessionalsStatsQueryKey = () => {
+export const getListReviewsQueryKey = (id: number,) => {
     return [
-    `/api/professionals/stats`
+    `/api/professionals/${id}/reviews`
     ] as const;
     }
 
 
-export const getGetProfessionalsStatsQueryOptions = <TData = Awaited<ReturnType<typeof getProfessionalsStats>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListReviewsQueryOptions = <TData = Awaited<ReturnType<typeof listReviews>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetProfessionalsStatsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListReviewsQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProfessionalsStats>>> = ({ signal }) => getProfessionalsStats({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listReviews>>> = ({ signal }) => listReviews(id, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetProfessionalsStatsQueryResult = NonNullable<Awaited<ReturnType<typeof getProfessionalsStats>>>
-export type GetProfessionalsStatsQueryError = ErrorType<unknown>
+export type ListReviewsQueryResult = NonNullable<Awaited<ReturnType<typeof listReviews>>>
+export type ListReviewsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get platform stats
+ * @summary List reviews for a professional
  */
 
-export function useGetProfessionalsStats<TData = Awaited<ReturnType<typeof getProfessionalsStats>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProfessionalsStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export function useListReviews<TData = Awaited<ReturnType<typeof listReviews>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listReviews>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetProfessionalsStatsQueryOptions(options)
+  const queryOptions = getListReviewsQueryOptions(id,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -424,4 +503,76 @@ export function useGetProfessionalsStats<TData = Awaited<ReturnType<typeof getPr
 
 
 
+
+export const getCreateReviewUrl = (id: number,) => {
+
+
+
+
+  return `/api/professionals/${id}/reviews`
+}
+
+/**
+ * @summary Submit a review for a professional
+ */
+export const createReview = async (id: number,
+    reviewInput: ReviewInput, options?: RequestInit): Promise<Review> => {
+
+  return customFetch<Review>(getCreateReviewUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      reviewInput,)
+  }
+);}
+
+
+
+
+export const getCreateReviewMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createReview>>, TError,{id: number;data: BodyType<ReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createReview>>, TError,{id: number;data: BodyType<ReviewInput>}, TContext> => {
+
+const mutationKey = ['createReview'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createReview>>, {id: number;data: BodyType<ReviewInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createReview(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateReviewMutationResult = NonNullable<Awaited<ReturnType<typeof createReview>>>
+    export type CreateReviewMutationBody = BodyType<ReviewInput>
+    export type CreateReviewMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a review for a professional
+ */
+export const useCreateReview = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createReview>>, TError,{id: number;data: BodyType<ReviewInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createReview>>,
+        TError,
+        {id: number;data: BodyType<ReviewInput>},
+        TContext
+      > => {
+      return useMutation(getCreateReviewMutationOptions(options));
+    }
 

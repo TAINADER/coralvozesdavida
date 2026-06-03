@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, LocateFixed, Loader2 } from "lucide-react";
 import { getCoordinates, getNearbyPlaces, getAddressFromCoords } from "@/lib/api";
-import { useListProfessionals, getListProfessionalsQueryKey } from "@workspace/api-client-react";
+import { useListProfessionals, getListProfessionalsQueryKey, Professional } from "@workspace/api-client-react";
+import ProfessionalProfile from "@/components/ProfessionalProfile";
 
 const RADIUS_OPTIONS = [
   { label: "100m",  meters: 100,   km: 0.1, zoom: 17 },
@@ -26,6 +27,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | number | null>(null);
   const [radiusIdx, setRadiusIdx] = useState(3); // default 3km
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const queryClient = useQueryClient();
 
   const radius = RADIUS_OPTIONS[radiusIdx];
@@ -157,6 +159,7 @@ export default function Home() {
                 places={overpassPlaces}
                 professionals={professionals}
                 selectedPlaceId={selectedPlaceId}
+                onViewProfile={setSelectedProfessional}
               />
             )}
           </div>
@@ -175,6 +178,7 @@ export default function Home() {
                     places={overpassPlaces}
                     professionals={professionals}
                     onSelectPlace={(id) => setSelectedPlaceId(id)}
+                    onViewProfile={setSelectedProfessional}
                     userLocation={location ?? { lat: -23.5505, lng: -46.6333 }}
                     isLoadingPlaces={isLoadingPlaces}
                     radiusKm={radius.km}
@@ -194,6 +198,13 @@ export default function Home() {
             </Tabs>
           </div>
         </div>
+      )}
+
+      {selectedProfessional && (
+        <ProfessionalProfile
+          professional={selectedProfessional}
+          onClose={() => setSelectedProfessional(null)}
+        />
       )}
     </div>
   );

@@ -44,12 +44,13 @@ function MapController({ location, zoom, selectedPlaceId, places, professionals 
   return null;
 }
 
-export default function MapComponent({ location, zoom, places, professionals, selectedPlaceId }: {
+export default function MapComponent({ location, zoom, places, professionals, selectedPlaceId, onViewProfile }: {
   location: { lat: number; lng: number };
   zoom: number;
   places: OverpassPlace[];
   professionals: Professional[];
   selectedPlaceId: string | number | null;
+  onViewProfile: (prof: Professional) => void;
 }) {
   return (
     <MapContainer center={[location.lat, location.lng]} zoom={zoom} className="w-full h-full min-h-[400px] z-0">
@@ -78,13 +79,20 @@ export default function MapComponent({ location, zoom, places, professionals, se
         prof.lat && prof.lng ? (
           <Marker key={`prof-${prof.id}`} position={[prof.lat, prof.lng]} icon={profIcon}>
             <Popup>
-              <div className="font-sans">
-                <strong className="block text-base mb-1">{prof.name}</strong>
-                <span className="text-sm text-gray-500 block">{prof.profession}{prof.professionDetail ? ` — ${prof.professionDetail}` : ""}</span>
-                <span className="inline-block mt-2 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-bold rounded">{prof.level}</span>
-                {prof.linkUrl && (
-                  <a href={prof.linkUrl} target="_blank" rel="noreferrer" className="block mt-2 text-teal-600 hover:underline text-sm font-semibold">Ver link</a>
-                )}
+              <div className="font-sans min-w-[160px]">
+                <strong className="block text-base mb-0.5">{prof.name}</strong>
+                <span className="text-sm text-gray-500 block capitalize">
+                  {prof.profession}{prof.professionDetail ? ` — ${prof.professionDetail}` : ""}
+                </span>
+                <span className="inline-block mt-1 mb-2 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-bold rounded">
+                  {prof.level === "profissional" ? "Profissional" : "Amador"}
+                </span>
+                <button
+                  onClick={() => onViewProfile(prof)}
+                  className="block w-full text-center mt-1 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded transition-colors"
+                >
+                  Ver perfil e avaliações
+                </button>
               </div>
             </Popup>
           </Marker>

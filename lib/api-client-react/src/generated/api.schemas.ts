@@ -60,6 +60,30 @@ export interface ProfessionalInput {
   address?: string;
 }
 
+export interface Review {
+  id: number;
+  professionalId: number;
+  reviewerName: string;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  rating: number;
+  /** @nullable */
+  comment?: string | null;
+  createdAt: string;
+}
+
+export interface ReviewInput {
+  reviewerName?: string;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  rating: number;
+  comment?: string;
+}
+
 export interface PlatformStats {
   totalProfessionals: number;
   totalProfessions: number;

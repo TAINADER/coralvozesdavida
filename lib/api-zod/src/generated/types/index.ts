@@ -13,3 +13,5 @@ export * from './professional';
 export * from './professionalInput';
 export * from './professionalInputLevel';
 export * from './professionalLevel';
+export * from './review';
+export * from './reviewInput';

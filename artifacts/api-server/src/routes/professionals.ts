@@ -1,7 +1,14 @@
 import { Router } from "express";
-import { db, professionalsTable } from "@workspace/db";
-import { eq, ilike, or, sql } from "drizzle-orm";
+import { db, professionalsTable, reviewsTable } from "@workspace/db";
+import { eq, sql } from "drizzle-orm";
 import { CreateProfessionalBody, ListProfessionalsQueryParams } from "@workspace/api-zod";
+import { z } from "zod/v4";
+
+const ReviewInputSchema = z.object({
+  reviewerName: z.string().min(1).max(80).optional(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().max(1000).optional(),
+});
 
 const router = Router();
 
@@ -121,6 +128,53 @@ router.get("/professionals/:id", async (req, res) => {
     res.json({ ...found, createdAt: found.createdAt.toISOString() });
   } catch (err) {
     res.status(500).json({ error: "Failed to get professional" });
+  }
+});
+
+router.get("/professionals/:id/reviews", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const reviews = await db
+      .select()
+      .from(reviewsTable)
+      .where(eq(reviewsTable.professionalId, id))
+      .orderBy(reviewsTable.createdAt);
+
+    res.json(reviews.map(r => ({ ...r, createdAt: r.createdAt.toISOString() })));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to list reviews" });
+  }
+});
+
+router.post("/professionals/:id/reviews", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const [professional] = await db
+      .select({ id: professionalsTable.id })
+      .from(professionalsTable)
+      .where(eq(professionalsTable.id, id));
+    if (!professional) return res.status(404).json({ error: "Professional not found" });
+
+    const parsed = ReviewInputSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: "Invalid data", details: parsed.error.issues });
+
+    const [created] = await db
+      .insert(reviewsTable)
+      .values({
+        professionalId: id,
+        reviewerName: parsed.data.reviewerName || "Anônimo",
+        rating: parsed.data.rating,
+        comment: parsed.data.comment ?? null,
+      })
+      .returning();
+
+    res.status(201).json({ ...created, createdAt: created.createdAt.toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create review" });
   }
 });
 
