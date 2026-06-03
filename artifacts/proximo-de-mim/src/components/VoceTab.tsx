@@ -30,6 +30,7 @@ const subjects = [
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
+  phone: z.string().optional(),
   photoUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   linkUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   profession: z.string().min(1, "Selecione uma profissão"),
@@ -47,6 +48,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      phone: "",
       photoUrl: "",
       linkUrl: "",
       profession: "",
@@ -62,6 +64,7 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
     createProfessional.mutate({
       data: {
         name: data.name,
+        phone: data.phone || undefined,
         photoUrl: data.photoUrl || undefined,
         linkUrl: data.linkUrl || undefined,
         profession: data.profession,
@@ -116,12 +119,26 @@ export default function VoceTab({ userLocation, onAdded }: { userLocation: { lat
 
           <FormField
             control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">Telefone / WhatsApp <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="(11) 99999-9999" className="bg-background" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="photoUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">Foto (URL)</FormLabel>
+                <FormLabel className="font-bold">Foto (URL) <span className="text-muted-foreground font-normal">(opcional)</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="Link para sua foto (opcional)" className="bg-background" {...field} />
+                  <Input placeholder="Link para sua foto" className="bg-background" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

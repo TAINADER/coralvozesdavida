@@ -101,6 +101,7 @@ router.post("/professionals", async (req, res) => {
         lat: data.lat ?? null,
         lng: data.lng ?? null,
         address: data.address ?? null,
+        phone: data.phone ?? null,
       })
       .returning();
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useListReviews, useCreateReview, Professional, getListReviewsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { X, Star, MapPin, ExternalLink, User, Loader2, MessageSquare, Send } from "lucide-react";
+import { X, Star, MapPin, ExternalLink, User, Loader2, MessageSquare, Send, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -109,12 +109,21 @@ export default function ProfessionalProfile({ professional, onClose }: { profess
             )}
           </div>
 
-          {/* Address & link */}
+          {/* Address, phone & link */}
           {professional.address && (
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
               <span>{professional.address}</span>
             </div>
+          )}
+          {professional.phone && (
+            <a
+              href={`tel:${professional.phone.replace(/\D/g, "")}`}
+              className="flex items-center gap-2 text-sm text-green-700 font-semibold hover:underline"
+            >
+              <Phone className="w-4 h-4" />
+              {professional.phone}
+            </a>
           )}
           {professional.linkUrl && (
             <a

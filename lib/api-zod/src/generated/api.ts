@@ -38,6 +38,7 @@ export const ListProfessionalsResponseItem = zod.object({
   "lat": zod.number().nullish(),
   "lng": zod.number().nullish(),
   "address": zod.string().nullish(),
+  "phone": zod.string().nullish(),
   "createdAt": zod.string()
 })
 export const ListProfessionalsResponse = zod.array(ListProfessionalsResponseItem)
@@ -56,7 +57,8 @@ export const CreateProfessionalBody = zod.object({
   "level": zod.enum(['amador', 'profissional']),
   "lat": zod.number().optional(),
   "lng": zod.number().optional(),
-  "address": zod.string().optional()
+  "address": zod.string().optional(),
+  "phone": zod.string().optional()
 })
 
 
@@ -89,6 +91,7 @@ export const GetProfessionalResponse = zod.object({
   "lat": zod.number().nullish(),
   "lng": zod.number().nullish(),
   "address": zod.string().nullish(),
+  "phone": zod.string().nullish(),
   "createdAt": zod.string()
 })
 

@@ -14,6 +14,7 @@ export const professionalsTable = pgTable("professionals", {
   lat: real("lat"),
   lng: real("lng"),
   address: text("address"),
+  phone: text("phone"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

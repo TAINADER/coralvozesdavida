@@ -36,6 +36,8 @@ export interface Professional {
   lng?: number | null;
   /** @nullable */
   address?: string | null;
+  /** @nullable */
+  phone?: string | null;
   createdAt: string;
 }
 
@@ -58,6 +60,7 @@ export interface ProfessionalInput {
   lat?: number;
   lng?: number;
   address?: string;
+  phone?: string;
 }
 
 export interface Review {

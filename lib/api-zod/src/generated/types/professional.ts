@@ -26,5 +26,7 @@ export interface Professional {
   lng?: number | null;
   /** @nullable */
   address?: string | null;
+  /** @nullable */
+  phone?: string | null;
   createdAt: string;
 }

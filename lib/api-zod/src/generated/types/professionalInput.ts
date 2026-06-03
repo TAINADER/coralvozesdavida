@@ -18,4 +18,5 @@ export interface ProfessionalInput {
   lat?: number;
   lng?: number;
   address?: string;
+  phone?: string;
 }

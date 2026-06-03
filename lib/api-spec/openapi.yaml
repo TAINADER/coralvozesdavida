@@ -199,6 +199,8 @@ components:
           type: ["number", "null"]
         address:
           type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
         createdAt:
           type: string
 
@@ -226,6 +228,8 @@ components:
         lng:
           type: number
         address:
+          type: string
+        phone:
           type: string
 
     Review:
