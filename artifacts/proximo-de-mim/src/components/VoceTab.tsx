@@ -95,9 +95,7 @@ function ProfessionCombobox({ value, onChange }: { value: string; onChange: (v: 
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filtered = inputValue.trim().length === 0
-    ? professions
-    : professions.filter(p => p.toLowerCase().includes(inputValue.toLowerCase()));
+  const filtered = professions.filter(p => p.toLowerCase().includes(inputValue.toLowerCase()));
 
   useEffect(() => {
     setInputValue(value);
@@ -131,8 +129,8 @@ function ProfessionCombobox({ value, onChange }: { value: string; onChange: (v: 
       <div className="relative flex items-center">
         <Input
           value={inputValue}
-          onChange={e => { setInputValue(e.target.value); onChange(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
+          onChange={e => { setInputValue(e.target.value); onChange(e.target.value); setOpen(e.target.value.trim().length > 0); }}
+          onFocus={() => { if (inputValue.trim().length > 0) setOpen(true); }}
           onKeyDown={e => {
             if (e.key === "Escape") { setOpen(false); (e.target as HTMLInputElement).blur(); }
             if (e.key === "Enter" && inputValue.trim()) { e.preventDefault(); onChange(inputValue.trim()); setOpen(false); }
