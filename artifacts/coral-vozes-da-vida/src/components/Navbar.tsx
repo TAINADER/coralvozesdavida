@@ -20,6 +20,7 @@ export function Navbar() {
     { label: 'Início', href: '#inicio' },
     { label: 'O Projeto', href: '#projeto' },
     { label: 'Nossas Metas', href: '#metas' },
+    { label: 'Vencedores', href: '#vencedores' },
     { label: 'Galeria', href: '#galeria' },
     { label: 'Inscrições', href: '#inscricoes' },
   ];
