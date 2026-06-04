@@ -55,6 +55,11 @@ export function Goals() {
       text: "Levar o coral a diversas apresentações públicas — hospitais, escolas, espaços culturais — ampliando o impacto social."
     },
     {
+      icon: <Megaphone size={24} />,
+      title: "Conscientização",
+      text: "Desmistificar o câncer infantil e valorizar a vida — levando esperança a pacientes, familiares e à sociedade."
+    },
+    {
       icon: <Users size={24} />,
       title: "Novos coristas",
       text: "Ampliar o grupo, conquistando o espaço que é deles: convocar ex-pacientes do Martagão que queiram fazer parte."
@@ -63,11 +68,6 @@ export function Goals() {
       icon: <Heart size={24} />,
       title: "Terapia pela música",
       text: "Proporcionar leveza, pertencimento e força a quem ainda vive sob acompanhamento médico e pressão emocional intensa."
-    },
-    {
-      icon: <Megaphone size={24} />,
-      title: "Conscientização",
-      text: "Desmistificar o câncer infantil e valorizar a vida — levando esperança a pacientes, familiares e à sociedade."
     },
     {
       icon: <Sparkles size={24} />,
