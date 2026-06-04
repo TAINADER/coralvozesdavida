@@ -1,6 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Music, MapPin, Users, Heart, Megaphone, Sparkles, Mic2 } from 'lucide-react';
+
+const EMAIL = "coralvozesdavida@gmail.com";
+
+function ContactCard({ color, icon, title, description, subject, buttonLabel, textColor }: {
+  color: string; icon: React.ReactNode; title: string; description: string;
+  subject: string; buttonLabel: string; textColor: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(EMAIL).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className={`${color} rounded-3xl p-8 text-center text-white flex flex-col items-center gap-4`}
+    >
+      <div className="w-10 h-10 opacity-90">{icon}</div>
+      <h3 className="text-xl font-bold">{title}</h3>
+      <p className="text-white/80 text-sm leading-relaxed">{description}</p>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className={`mt-auto inline-block bg-white ${textColor} hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow`}
+      >
+        {buttonLabel}
+      </button>
+      {open && (
+        <div className="w-full bg-white/15 border border-white/25 rounded-2xl px-4 py-4 space-y-3">
+          <p className="text-sm font-medium">Envie um e-mail para:</p>
+          <div className="flex items-center justify-between gap-2 bg-white/15 rounded-xl px-3 py-2">
+            <span className="text-sm font-mono break-all">{EMAIL}</span>
+            <button
+              onClick={handleCopy}
+              className="shrink-0 bg-white/30 hover:bg-white/50 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {copied ? "Copiado ✓" : "Copiar"}
+            </button>
+          </div>
+          <p className="text-white/60 text-xs">
+            Mencione no assunto: <em>"{subject}"</em>
+          </p>
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 export function Goals() {
   const goals = [
@@ -70,43 +122,24 @@ export function Goals() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Contratação */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="bg-gradient-to-br from-[#F05D5A] to-[#d94a47] rounded-3xl p-8 text-center text-white flex flex-col items-center gap-4"
-          >
-            <Mic2 className="w-10 h-10 opacity-90" />
-            <h3 className="text-xl font-bold">Contrate a nossa apresentação</h3>
-            <p className="text-white/80 text-sm leading-relaxed">Leve o Vozes da Vida para o seu evento, escola, empresa ou espaço cultural.</p>
-            <a
-              href="mailto:coralvozesdavida@gmail.com?subject=Contratação de apresentação – Coral Vozes da Vida"
-              className="mt-auto inline-block bg-white text-[#F05D5A] hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow"
-            >
-              Falar sobre contratação
-            </a>
-          </motion.div>
-
-          {/* Patrocínio */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-gradient-to-br from-[#4A20BD] to-[#6B3FD4] rounded-3xl p-8 text-center text-white flex flex-col items-center gap-4"
-          >
-            <Heart className="w-10 h-10 opacity-90" />
-            <h3 className="text-xl font-bold">Venha ser patrocinador do projeto</h3>
-            <p className="text-white/80 text-sm leading-relaxed">Associe sua marca a uma história de superação, esperança e impacto social real.</p>
-            <a
-              href="mailto:coralvozesdavida@gmail.com?subject=Patrocínio – Coral Vozes da Vida"
-              className="mt-auto inline-block bg-white text-[#4A20BD] hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow"
-            >
-              Quero ser patrocinador
-            </a>
-          </motion.div>
+          <ContactCard
+            color="bg-gradient-to-br from-[#F05D5A] to-[#d94a47]"
+            icon={<Mic2 size={40} />}
+            title="Contrate a nossa apresentação"
+            description="Leve o Vozes da Vida para o seu evento, escola, empresa ou espaço cultural."
+            subject="Contratação de apresentação"
+            buttonLabel="Falar sobre contratação"
+            textColor="text-[#F05D5A]"
+          />
+          <ContactCard
+            color="bg-gradient-to-br from-[#4A20BD] to-[#6B3FD4]"
+            icon={<Heart size={40} />}
+            title="Venha ser patrocinador do projeto"
+            description="Associe sua marca a uma história de superação, esperança e impacto social real."
+            subject="Patrocínio – Coral Vozes da Vida"
+            buttonLabel="Quero ser patrocinador"
+            textColor="text-[#4A20BD]"
+          />
         </div>
       </div>
     </section>
