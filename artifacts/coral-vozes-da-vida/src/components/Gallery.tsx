@@ -24,7 +24,12 @@ export function Gallery() {
   const partners = [
     "Flávio Venturini",
     "Carla Visi",
-    "Saulo"
+    "Saulo",
+    "Gilberto Gil",
+    "Gerônimo",
+    "Marinez",
+    "Ricardo Chaves",
+    "Jota Quest",
   ];
 
   return (
@@ -87,7 +92,7 @@ export function Gallery() {
 
         <div className="bg-primary/5 rounded-3xl p-10 text-center border border-primary/10">
           <Star className="w-12 h-12 text-accent mx-auto mb-6" />
-          <h3 className="text-2xl font-bold text-primary mb-8">Artistas Parceiros</h3>
+          <h3 className="text-2xl font-bold text-primary mb-8">Artistas Parceiros e Inspiradores</h3>
           <div className="flex flex-wrap justify-center gap-4 md:gap-8">
             {partners.map((partner, i) => (
               <motion.div
