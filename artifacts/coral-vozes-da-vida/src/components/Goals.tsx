@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, MapPin, Users, Heart, Megaphone, Sparkles, Mic2 } from 'lucide-react';
 
-const EMAIL = "coralvozesdavida@gmail.com";
+const WA_NUMBER = "5571999123302";
 
-function ContactCard({ color, icon, title, description, subject, buttonLabel, textColor }: {
+function ContactCard({ color, icon, title, description, message, buttonLabel, textColor }: {
   color: string; icon: React.ReactNode; title: string; description: string;
-  subject: string; buttonLabel: string; textColor: string;
+  message: string; buttonLabel: string; textColor: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(EMAIL).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    });
-  };
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,29 +20,18 @@ function ContactCard({ color, icon, title, description, subject, buttonLabel, te
       <div className="w-10 h-10 opacity-90">{icon}</div>
       <h3 className="text-xl font-bold">{title}</h3>
       <p className="text-white/80 text-sm leading-relaxed">{description}</p>
-      <button
-        onClick={() => setOpen(v => !v)}
-        className={`mt-auto inline-block bg-white ${textColor} hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow`}
+      <a
+        href={waUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`mt-auto inline-flex items-center gap-2 bg-white ${textColor} hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow`}
       >
+        <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.524 5.855L.057 23.57a.5.5 0 0 0 .614.612l5.857-1.53A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.866 9.866 0 0 1-5.03-1.378l-.36-.214-3.733.976.999-3.645-.235-.374A9.867 9.867 0 0 1 2.1 12C2.1 6.534 6.534 2.1 12 2.1c5.466 0 9.9 4.434 9.9 9.9 0 5.466-4.434 9.9-9.9 9.9z"/>
+        </svg>
         {buttonLabel}
-      </button>
-      {open && (
-        <div className="w-full bg-white/15 border border-white/25 rounded-2xl px-4 py-4 space-y-3">
-          <p className="text-sm font-medium">Envie um e-mail para:</p>
-          <div className="flex items-center justify-between gap-2 bg-white/15 rounded-xl px-3 py-2">
-            <span className="text-sm font-mono break-all">{EMAIL}</span>
-            <button
-              onClick={handleCopy}
-              className="shrink-0 bg-white/30 hover:bg-white/50 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
-            >
-              {copied ? "Copiado ✓" : "Copiar"}
-            </button>
-          </div>
-          <p className="text-white/60 text-xs">
-            Mencione no assunto: <em>"{subject}"</em>
-          </p>
-        </div>
-      )}
+      </a>
     </motion.div>
   );
 }
@@ -127,8 +109,8 @@ export function Goals() {
             icon={<Mic2 size={40} />}
             title="Contrate a nossa apresentação"
             description="Leve o Vozes da Vida para o seu evento, escola, empresa ou espaço cultural."
-            subject="Contratação de apresentação"
-            buttonLabel="Falar sobre contratação"
+            message="Olá! Assunto: quero contratar uma apresentação do Coral Vozes da Vida."
+            buttonLabel="Falar no WhatsApp"
             textColor="text-[#F05D5A]"
           />
           <ContactCard
@@ -136,8 +118,8 @@ export function Goals() {
             icon={<Heart size={40} />}
             title="Venha ser patrocinador do projeto"
             description="Associe sua marca a uma história de superação, esperança e impacto social real."
-            subject="Patrocínio – Coral Vozes da Vida"
-            buttonLabel="Quero ser patrocinador"
+            message="Olá! Assunto: quero patrocinar o Coral Vozes da Vida."
+            buttonLabel="Falar no WhatsApp"
             textColor="text-[#4A20BD]"
           />
         </div>
