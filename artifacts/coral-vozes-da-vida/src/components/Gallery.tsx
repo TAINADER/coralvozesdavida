@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Star } from 'lucide-react';
+import { Calendar, MapPin, Star, PlayCircle } from 'lucide-react';
 
 import shoppingImg from '@assets/gallery_shopping_victoria.jpg';
 import casaRosaImg from '@assets/gallery_casa_rosa.jpg';
@@ -11,9 +11,9 @@ import eventoImg from '@assets/gallery_evento_especial.jpg';
 
 export function Gallery() {
   const events = [
+    { title: "Pipoca de Saulo na Concha Acústica", venue: "TCA (Teatro Castro Alves)", date: "2024", img: tcaImg, link: "https://www.youtube.com/live/bRflVlsyHdU?si=mqO18X4_ok_zPM-L" },
     { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", img: shoppingImg },
     { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", img: casaRosaImg },
-    { title: "Espetáculo Anual", venue: "TCA (Teatro Castro Alves)", date: "2024", img: tcaImg },
     { title: "Homenagem aos Pacientes", venue: "Hospital Martagão Gesteira", date: "2024", img: hospitalImg },
     { title: "Gala Solidária", venue: "Jantar do Bem", date: "2024", img: jantarImg },
     { title: "Celebração da Vida", venue: "Evento Especial", date: "2024", img: eventoImg },
@@ -66,6 +66,18 @@ export function Gallery() {
                     <span>{event.date}</span>
                   </div>
                 </div>
+
+                {event.link && (
+                  <a
+                    href={event.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white font-bold px-5 py-2.5 rounded-full text-sm transition-colors duration-200"
+                  >
+                    <PlayCircle size={16} />
+                    Assistir apresentação
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
