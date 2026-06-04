@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Eye, Instagram, Mic2, Music2 } from 'lucide-react';
+import { Calendar, Users, Eye, Instagram, Mic2 } from 'lucide-react';
 import maestroImg from '@assets/4308f622-bd07-489e-aa6c-20a9812da31f_1779882739722.jpeg';
 
 export function Project() {
@@ -15,7 +15,7 @@ export function Project() {
   return (
     <section id="projeto" className="py-24 bg-white">
       <div className="container mx-auto px-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -24,14 +24,61 @@ export function Project() {
         >
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">O Projeto</h2>
           <div className="w-24 h-1 bg-accent mx-auto mb-8 rounded-full" />
-          
-          <p className="text-lg text-gray-700 leading-relaxed mb-6">
-            O Coral Vozes da Vida tem capacidade para <strong className="text-primary">100 coralistas</strong> e é aberto a ex-pacientes do Hospital Martagão Gesteira.
-          </p>
-          <p className="text-lg text-gray-700 leading-relaxed bg-primary/5 p-6 rounded-2xl border border-primary/10">
-            Cada membro recebe: <strong className="text-primary">fardamento completo</strong>, <strong className="text-primary">transporte</strong> para os ensaios e apresentações, e <strong className="text-primary">lanche</strong> durante os encontros.
-          </p>
         </motion.div>
+
+        {/* Texto principal em dois blocos */}
+        <div className="max-w-4xl mx-auto space-y-6 mb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-lg text-gray-700 leading-relaxed"
+          >
+            O Coral Vozes da Vida é um coral de ex-pacientes do Hospital Martagão Gesteira, com pessoas que enfrentaram — com coragem e esperança — o tratamento oncológico. Mais do que um coral, o projeto é um símbolo de superação: cada voz que ecoa no palco carrega uma história de luta, de amor à vida e de recomeço.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-lg text-gray-700 leading-relaxed"
+          >
+            O projeto existe desde 2023 com uma missão que vai além da música: ao desmistificar o câncer infantil, valorizar a vida e levar esperança a pacientes, familiares e à sociedade, cada apresentação é uma declaração de que é possível superar, recomeçar e transformar a dor em arte.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg text-gray-700 leading-relaxed"
+          >
+            O Vozes da Vida também carrega um papel profundamente terapêutico. Muitos dos que dele participam passam por tratamentos longos e permanecem em acompanhamento médico de remissão por 5 a 10 anos, com constante monitoramento. Para esses jovens, a música não é apenas expressão — é leveza, pertencimento e força para seguir em frente.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="bg-primary/5 border border-primary/10 rounded-2xl p-6 text-lg text-gray-700 leading-relaxed"
+          >
+            O projeto é de <strong className="text-primary">acesso gratuito</strong> e fruto da parceria do Maestro Luciano Calazans com o Hospital Martagão Gesteira. Cada membro recebe <strong className="text-primary">fardamento completo</strong>, <strong className="text-primary">transporte</strong> e <strong className="text-primary">lanche</strong> — para que nenhum obstáculo impeça a participação.
+          </motion.div>
+
+          {/* Hospital 60 anos */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="bg-accent/10 border border-accent/20 rounded-2xl p-6 text-lg text-gray-700 leading-relaxed"
+          >
+            O Hospital Martagão Gesteira completa <strong className="text-primary">60 anos</strong> de existência servindo à população da Bahia de forma <strong className="text-primary">100% SUS</strong>. O Vozes da Vida é uma forma de ecoar ainda mais esta mensagem: <em>esse hospital importa, essas crianças importam, essas histórias precisam ser contadas.</em>
+          </motion.div>
+        </div>
 
         {/* Maestro Idealizador */}
         <motion.div
@@ -45,7 +92,6 @@ export function Project() {
             <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-            {/* Foto */}
             <div className="w-full md:w-56 flex-shrink-0">
               <img
                 src={maestroImg}
@@ -54,7 +100,6 @@ export function Project() {
               />
             </div>
 
-            {/* Texto */}
             <div className="relative z-10 p-8 text-white text-center md:text-left flex flex-col justify-center gap-3">
               <p className="text-xs font-bold uppercase tracking-widest text-accent">Nosso Maestro Idealizador</p>
               <h3 className="text-3xl md:text-4xl font-bold">Luciano Calazans</h3>
@@ -63,6 +108,7 @@ export function Project() {
           </div>
         </motion.div>
 
+        {/* Realizações */}
         <div className="mt-16">
           <h3 className="text-2xl font-bold text-center text-gray-900 mb-12">Realizações do Projeto</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">

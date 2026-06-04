@@ -1,32 +1,38 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Music, MapPin, Disc3, Users, Youtube, Handshake } from 'lucide-react';
+import { Music, MapPin, Users, Heart, Megaphone, Sparkles } from 'lucide-react';
 
 export function Goals() {
   const goals = [
     {
       icon: <Music size={24} />,
-      text: "Expandir o repertório com músicas nacionais e internacionais, incluindo músicas de artistas baianos"
+      title: "20 ensaios no novo ciclo",
+      text: "Realizar 20 ensaios no novo ciclo anual de atividades, com dedicação, leveza e muita música."
     },
     {
       icon: <MapPin size={24} />,
-      text: "Levar o coral para apresentações em hospitais, escolas e espaços culturais, ampliando o alcance e o impacto social"
-    },
-    {
-      icon: <Disc3 size={24} />,
-      text: "Realizar a gravação do primeiro CD do coral"
+      title: "Apresentações públicas",
+      text: "Levar o coral a diversas apresentações públicas — hospitais, escolas, espaços culturais — ampliando o impacto social."
     },
     {
       icon: <Users size={24} />,
-      text: "Conquistar 10.000 seguidores nas redes sociais"
+      title: "Novos coristas",
+      text: "Ampliar o grupo, conquistando o espaço que é deles: convocar ex-pacientes do Martagão que queiram fazer parte."
     },
     {
-      icon: <Youtube size={24} />,
-      text: "Alcançar 1 milhão de visualizações no YouTube"
+      icon: <Heart size={24} />,
+      title: "Terapia pela música",
+      text: "Proporcionar leveza, pertencimento e força a quem ainda vive sob acompanhamento médico e pressão emocional intensa."
     },
     {
-      icon: <Handshake size={24} />,
-      text: "Firmar parcerias com artistas locais e nacionais para enriquecer as apresentações e o repertório do coral"
+      icon: <Megaphone size={24} />,
+      title: "Conscientização",
+      text: "Desmistificar o câncer infantil e valorizar a vida — levando esperança a pacientes, familiares e à sociedade."
+    },
+    {
+      icon: <Sparkles size={24} />,
+      title: "Ecoar a mensagem",
+      text: "Mostrar à sociedade: esse hospital importa, essas crianças importam, essas histórias precisam ser contadas."
     }
   ];
 
@@ -50,11 +56,13 @@ export function Goals() {
             >
               <div className="absolute top-0 left-0 w-1.5 h-full bg-accent scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-300" />
               
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                 {goal.icon}
               </div>
+
+              <h3 className="text-primary font-bold text-lg mb-2">{goal.title}</h3>
               
-              <p className="text-gray-700 text-lg font-medium leading-relaxed">
+              <p className="text-gray-600 text-base leading-relaxed">
                 {goal.text}
               </p>
             </motion.div>
@@ -68,7 +76,7 @@ export function Goals() {
           transition={{ duration: 0.5 }}
           className="mt-4 bg-gradient-to-r from-[#4A20BD] to-[#6B3FD4] rounded-3xl p-10 text-center text-white"
         >
-          <Handshake className="w-12 h-12 mx-auto mb-4 opacity-90" />
+          <Heart className="w-12 h-12 mx-auto mb-4 opacity-90" />
           <h3 className="text-2xl font-bold mb-3">Quer nos apoiar ou patrocinar?</h3>
           <p className="text-white/80 text-lg mb-6">Fale com a gente e faça parte desta história de superação e esperança.</p>
           <a
