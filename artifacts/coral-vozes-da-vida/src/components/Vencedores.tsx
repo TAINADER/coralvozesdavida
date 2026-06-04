@@ -7,6 +7,11 @@ import joaoCoral from '@assets/IMG_4620_1780536320603.jpeg';
 import joaoFotos from '@assets/IMG_4621_1780536320603.jpeg';
 import joaoFamilia from '@assets/IMG_4622_1780536320603.jpeg';
 
+import esterFlores from '@assets/IMG_4623_1780536438451.jpeg';
+import esterHoje from '@assets/IMG_4624_1780536438451.jpeg';
+import esterApresentacao from '@assets/IMG_4625_1780536438451.jpeg';
+import esterSelfie from '@assets/IMG_4626_1780536438451.jpeg';
+
 const members = [
   {
     nome: "João Vitor Santiago de Santana",
@@ -24,6 +29,24 @@ const members = [
       { src: joaoTratamento, legenda: "Durante o tratamento — sorrindo sempre" },
       { src: joaoFotos, legenda: "Com o coral e sua mãe Samantha, fundamental em sua cura" },
       { src: joaoFamilia, legenda: "Com o Coral Vozes da Vida" },
+    ],
+  },
+  {
+    nome: "Ester Faria Falcão Maia",
+    idade: "24 anos",
+    diagnostico: "Linfoma de Hodgkin",
+    historia: [
+      "Ester foi diagnosticada com Linfoma de Hodgkin e iniciou seu tratamento em 2019, tendo alta no final do mesmo ano — sem a necessidade de transplante. Hoje vive uma vida normal, fazendo apenas acompanhamento periódico no hospital.",
+      "Com 24 anos, cursa licenciatura em Letras e Pedagogia e trabalha como professora de crianças. Tudo iniciado após o tratamento. Ela também é poetiza e escreve lindamente.",
+      "Seu maior sonho está bem próximo: se tornar uma professora de referência na sua área e viver em uma chácara cercada de bichinhos.",
+    ],
+    frase: "Quando conheci o Coral Vozes da Vida, não imaginei que conseguiria transformar tantos sentimentos guardados em mim, através da música, através do canto. Hoje não canto no Coral apenas por mim, mas por Sabrina, Emily, Beatriz, e todas as crianças que conheci, e que hoje não estão aqui para terem suas vozes ouvidas. Contudo, em memória e homenagem, carrego todas comigo. Cantar a vida, é essa força que nos une.",
+    inspiracao: "Ester nos ensina muitas coisas e o seu olhar terno sobre a sua vida e as vidas que formam a sua vida dá um toque todo especial a nosso CORAL VOZES DA VIDA. TODOS NÓS SOMOS VENCEDORES DE CADA DIA!",
+    fotos: [
+      { src: esterFlores, legenda: "Ester durante o tratamento — linda e sorridente" },
+      { src: esterHoje, legenda: "Ester hoje" },
+      { src: esterApresentacao, legenda: "Cantando com Carla Visi na Concha Acústica do TCA | fev/2024" },
+      { src: esterSelfie, legenda: "Ester canta sua história no Coral Vozes da Vida" },
     ],
   },
 ];
