@@ -26,6 +26,7 @@ const members = [
   {
     nome: "João Vitor Santiago de Santana",
     idade: "13 anos",
+    idadeLabel: "13 anos quando começou a cantar no coral",
     diagnostico: "LLA — Leucemia Linfoide Aguda",
     historia: [
       "Aos 3 anos de João foi descoberta uma LLA — Leucemia Linfoide Aguda. Ele fez tratamento por 3 longos anos, até 2017.",
@@ -44,6 +45,7 @@ const members = [
   {
     nome: "Ester Faria Falcão Maia",
     idade: "24 anos",
+    idadeLabel: "24 anos quando começou a cantar no coral",
     diagnostico: "Linfoma de Hodgkin",
     historia: [
       "Ester foi diagnosticada com Linfoma de Hodgkin e iniciou seu tratamento em 2019, tendo alta no final do mesmo ano — sem a necessidade de transplante. Hoje vive uma vida normal, fazendo apenas acompanhamento periódico no hospital.",
@@ -61,7 +63,8 @@ const members = [
   },
   {
     nome: "Andressa da Silva Prestes",
-    idade: "13 anos",
+    idade: "12 anos",
+    idadeLabel: "12 anos quando começou a cantar no coral",
     diagnostico: "Craniofaringioma — tumor inoperável",
     historia: [
       "Aos 5 aninhos, Andressa foi diagnosticada com craniofaringioma, um tumor inoperável. Ela passou por 6 cirurgias, quimioterapia e radioterapia. Há 6 anos teve alta do Hospital Martagão Gesteira, onde segue com acompanhamento regular periódico.",
@@ -80,6 +83,7 @@ const members = [
   {
     nome: "Gabriel Cardoso de Jesus Santos",
     idade: "15 anos",
+    idadeLabel: "15 anos quando começou a cantar no coral",
     diagnostico: "Leucemia Linfoide Aguda",
     historia: [
       "Com menos de 2 aninhos, Gabi iniciou o tratamento de Leucemia Linfoide Aguda no Hospital Martagão Gesteira. Uma luta longa — ele somente finalizou os tratamentos aos 10 anos.",
@@ -103,7 +107,7 @@ function PhotoCarousel({ fotos }: { fotos: { src: string; legenda: string }[] })
   const next = () => setIdx(i => (i + 1) % fotos.length);
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-2xl shadow-lg aspect-[4/3] bg-gray-100">
+      <div className="overflow-hidden rounded-2xl shadow-lg aspect-square bg-gray-100">
         <AnimatePresence mode="wait">
           <motion.img
             key={idx}
@@ -113,7 +117,7 @@ function PhotoCarousel({ fotos }: { fotos: { src: string; legenda: string }[] })
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.35 }}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
           />
         </AnimatePresence>
       </div>
@@ -185,7 +189,7 @@ export function Vencedores() {
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-[#F05D5A] mb-1">Vencedor que canta</p>
                   <h3 className="text-3xl font-bold text-primary">{m.nome}</h3>
-                  <p className="text-gray-500 font-medium mt-0.5">{m.idade}</p>
+                  <p className="text-gray-400 text-sm font-medium mt-1 italic">{m.idadeLabel}</p>
                 </div>
 
                 <div className="inline-block bg-[#F05D5A]/10 text-[#F05D5A] text-sm font-bold px-4 py-1.5 rounded-full">
