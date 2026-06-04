@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Music, MapPin, Users, Heart, Megaphone, Sparkles } from 'lucide-react';
+import { Music, MapPin, Users, Heart, Megaphone, Sparkles, Mic2 } from 'lucide-react';
 
 export function Goals() {
   const goals = [
@@ -69,23 +69,45 @@ export function Goals() {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mt-4 bg-gradient-to-r from-[#4A20BD] to-[#6B3FD4] rounded-3xl p-10 text-center text-white"
-        >
-          <Heart className="w-12 h-12 mx-auto mb-4 opacity-90" />
-          <h3 className="text-2xl font-bold mb-3">Quer nos apoiar ou patrocinar?</h3>
-          <p className="text-white/80 text-lg mb-6">Fale com a gente e faça parte desta história de superação e esperança.</p>
-          <a
-            href="mailto:coralvozesdavida@gmail.com"
-            className="inline-block bg-[#F05D5A] hover:bg-[#d94a47] text-white font-bold px-10 py-4 rounded-full text-lg transition-colors duration-200"
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Contratação */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-br from-[#F05D5A] to-[#d94a47] rounded-3xl p-8 text-center text-white flex flex-col items-center gap-4"
           >
-            coralvozesdavida@gmail.com
-          </a>
-        </motion.div>
+            <Mic2 className="w-10 h-10 opacity-90" />
+            <h3 className="text-xl font-bold">Contrate a nossa apresentação</h3>
+            <p className="text-white/80 text-sm leading-relaxed">Leve o Vozes da Vida para o seu evento, escola, empresa ou espaço cultural.</p>
+            <a
+              href="mailto:coralvozesdavida@gmail.com?subject=Contratação de apresentação – Coral Vozes da Vida"
+              className="mt-auto inline-block bg-white text-[#F05D5A] hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow"
+            >
+              Falar sobre contratação
+            </a>
+          </motion.div>
+
+          {/* Patrocínio */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-gradient-to-br from-[#4A20BD] to-[#6B3FD4] rounded-3xl p-8 text-center text-white flex flex-col items-center gap-4"
+          >
+            <Heart className="w-10 h-10 opacity-90" />
+            <h3 className="text-xl font-bold">Venha ser patrocinador do projeto</h3>
+            <p className="text-white/80 text-sm leading-relaxed">Associe sua marca a uma história de superação, esperança e impacto social real.</p>
+            <a
+              href="mailto:coralvozesdavida@gmail.com?subject=Patrocínio – Coral Vozes da Vida"
+              className="mt-auto inline-block bg-white text-[#4A20BD] hover:bg-white/90 font-bold px-8 py-3 rounded-full text-base transition-colors duration-200 shadow"
+            >
+              Quero ser patrocinador
+            </a>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
