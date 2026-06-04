@@ -15,7 +15,7 @@ export function Gallery() {
     { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", img: shoppingImg },
     { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", img: casaRosaImg },
     { title: "Homenagem aos Pacientes", venue: "Hospital Martagão Gesteira", date: "2024", img: hospitalImg },
-    { title: "Gala Solidária", venue: "Jantar do Bem", date: "2024", img: jantarImg },
+    { title: "Jantar do Bem", venue: "Pupileira", date: "2024", img: jantarImg },
     { title: "Celebração da Vida", venue: "Evento Especial", date: "2024", img: eventoImg },
   ];
 
