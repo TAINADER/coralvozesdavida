@@ -5,7 +5,7 @@ import maestroImg from '@assets/4308f622-bd07-489e-aa6c-20a9812da31f_17798827397
 
 export function Project() {
   const stats = [
-    { icon: <Calendar className="text-accent" size={32} />, label: 'Ensaios realizados', value: '32' },
+    { icon: <Calendar className="text-accent" size={32} />, label: 'Ensaios realizados', value: '+40' },
     { icon: <Mic2 className="text-primary" size={32} />, label: 'Apresentações', value: '+20' },
     { icon: <Users className="text-accent" size={32} />, label: 'Pessoas no público', value: '10.000+' },
     { icon: <Eye className="text-primary" size={32} />, label: 'Visualizações no YouTube', value: '100.160' },
