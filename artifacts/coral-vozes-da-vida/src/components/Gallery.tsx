@@ -29,7 +29,7 @@ export function Gallery() {
     "Jota Quest",
     "Marinez",
     "Ricardo Chaves",
-    "Saulo",
+    "Saulo Fernandes",
   ];
 
   return (
