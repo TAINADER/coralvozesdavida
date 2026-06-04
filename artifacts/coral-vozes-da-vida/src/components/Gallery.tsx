@@ -8,9 +8,11 @@ import tcaImg from '@assets/gallery_tca.jpg';
 import hospitalImg from '@assets/gallery_hospital.jpg';
 import jantarImg from '@assets/gallery_jantar_bem.jpg';
 import eventoImg from '@assets/gallery_evento_especial.jpg';
+import natalBemImg from '@assets/2570fb98-4a08-45c5-b379-c702b57b1c8c_1780538575050.jpeg';
 
 export function Gallery() {
   const events = [
+    { title: "Natal do Bem", venue: "Concha Acústica", date: "2025", img: natalBemImg, link: "https://www.youtube.com/live/B0n2i5H91NQ?si=LuPh4SMSMY4WX3jS" },
     { title: "Pipoca de Saulo na Concha Acústica", venue: "TCA (Teatro Castro Alves)", date: "2024", img: tcaImg, link: "https://www.youtube.com/live/bRflVlsyHdU?si=mqO18X4_ok_zPM-L" },
     { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", img: shoppingImg },
     { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", img: casaRosaImg },
