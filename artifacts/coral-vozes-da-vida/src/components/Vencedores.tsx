@@ -12,6 +12,11 @@ import esterHoje from '@assets/IMG_4624_1780536438451.jpeg';
 import esterApresentacao from '@assets/IMG_4625_1780536438451.jpeg';
 import esterSelfie from '@assets/IMG_4626_1780536438451.jpeg';
 
+import andressaTratamento from '@assets/IMG_4627_1780536531682.jpeg';
+import andressaHoje from '@assets/IMG_4628_1780536531682.jpeg';
+import andressaCoral from '@assets/IMG_4629_1780536531682.jpeg';
+import andressaAbrace from '@assets/IMG_4630_1780536531683.jpeg';
+
 const members = [
   {
     nome: "João Vitor Santiago de Santana",
@@ -47,6 +52,24 @@ const members = [
       { src: esterHoje, legenda: "Ester hoje" },
       { src: esterApresentacao, legenda: "Cantando com Carla Visi na Concha Acústica do TCA | fev/2024" },
       { src: esterSelfie, legenda: "Ester canta sua história no Coral Vozes da Vida" },
+    ],
+  },
+  {
+    nome: "Andressa da Silva Prestes",
+    idade: "13 anos",
+    diagnostico: "Craniofaringioma — tumor inoperável",
+    historia: [
+      "Aos 5 aninhos, Andressa foi diagnosticada com craniofaringioma, um tumor inoperável. Ela passou por 6 cirurgias, quimioterapia e radioterapia. Há 6 anos teve alta do Hospital Martagão Gesteira, onde segue com acompanhamento regular periódico.",
+      "Após anos sem crescimento do tumor, o tratamento de Andressa é considerado um sucesso. Ela usufrui da sua vida com saúde e alegria — vida totalmente normal.",
+      "Andressa adora cantar, desenhar e pintar, e sonha se tornar advogada quando crescer. Ela canta a sua história no Coral Vozes da Vida.",
+    ],
+    frase: "Desde que eu entrei no Vozes da Vida, percebi o intuito das músicas: traz alegria, felicidade. E, com o coral, me desenvolvi muito, fiz amizades, e isso me ajudou muito na convivência com as outras pessoas, até na minha escola. Antes eu era muito tímida.",
+    inspiracao: "A história de vida de Andressa nos ensina sobre as lutas invisíveis que existem em nossa sociedade. Cantamos a sua VITÓRIA DE CADA DIA e desejamos estar presentes com ela em muitos momentos inesquecíveis. Mergulhando no viver com amor e música.",
+    fotos: [
+      { src: andressaHoje, legenda: "Andressa hoje, na frente do Hospital Martagão Gesteira" },
+      { src: andressaTratamento, legenda: "Andressa durante o tratamento — sempre sorrindo" },
+      { src: andressaCoral, legenda: "Ensaios e apresentações com o Coral Vozes da Vida" },
+      { src: andressaAbrace, legenda: "Andressa no Coral Vozes da Vida" },
     ],
   },
 ];
