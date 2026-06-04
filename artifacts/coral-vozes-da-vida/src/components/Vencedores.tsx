@@ -17,6 +17,11 @@ import andressaHoje from '@assets/IMG_4628_1780536531682.jpeg';
 import andressaCoral from '@assets/IMG_4629_1780536531682.jpeg';
 import andressaAbrace from '@assets/IMG_4630_1780536531683.jpeg';
 
+import gabrielInfancia from '@assets/IMG_4631_1780536615581.jpeg';
+import gabrielFutebol from '@assets/IMG_4632_1780536615582.jpeg';
+import gabrielCoral from '@assets/IMG_4633_1780536615582.jpeg';
+import gabrielAbrace from '@assets/IMG_4634_1780536615582.jpeg';
+
 const members = [
   {
     nome: "João Vitor Santiago de Santana",
@@ -70,6 +75,24 @@ const members = [
       { src: andressaTratamento, legenda: "Andressa durante o tratamento — sempre sorrindo" },
       { src: andressaCoral, legenda: "Ensaios e apresentações com o Coral Vozes da Vida" },
       { src: andressaAbrace, legenda: "Andressa no Coral Vozes da Vida" },
+    ],
+  },
+  {
+    nome: "Gabriel Cardoso de Jesus Santos",
+    idade: "15 anos",
+    diagnostico: "Leucemia Linfoide Aguda",
+    historia: [
+      "Com menos de 2 aninhos, Gabi iniciou o tratamento de Leucemia Linfoide Aguda no Hospital Martagão Gesteira. Uma luta longa — ele somente finalizou os tratamentos aos 10 anos.",
+      "Após anos sem reincidiva e sempre com acompanhamento médico, Gabriel está considerado curado de leucemia. Uma vitória conquistada dia a dia.",
+      "Seu sonho é ser jogador profissional de futebol. Atualmente treina semanalmente no Instituto DNA de Futebol — e canta no Coral Vozes da Vida.",
+    ],
+    frase: "O Coral Vozes da Vida é perfeito para mim. Me fez voltar no passado e relembrar momentos que tive dentro do Martagão, me permitiu reencontrar pessoas que fizeram tratamento comigo, e sou muito feliz por poder ajudar outras pessoas que estão passando pelo mesmo processo que eu passei.",
+    inspiracao: "A história de vida de Gabriel nos inspira e cantamos junto com ele a sua VITÓRIA e de todos aqueles que enfrentam lutas como a dele. Abraçando a vida com amor e música.",
+    fotos: [
+      { src: gabrielFutebol, legenda: "Gabriel hoje — jogador no Instituto DNA de Futebol" },
+      { src: gabrielInfancia, legenda: "Gabi durante o tratamento — com 3 e 4 aninhos" },
+      { src: gabrielCoral, legenda: "Ensaiando com Saulo e cantando para 6 mil pessoas na Concha Acústica do TCA" },
+      { src: gabrielAbrace, legenda: "Gabriel com o Coral Vozes da Vida" },
     ],
   },
 ];
