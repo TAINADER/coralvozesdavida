@@ -22,14 +22,14 @@ export function Gallery() {
   ];
 
   const partners = [
-    "Flávio Venturini",
     "Carla Visi",
-    "Saulo",
-    "Gilberto Gil",
+    "Flávio Venturini",
     "Gerônimo",
+    "Gilberto Gil",
+    "Jota Quest",
     "Marinez",
     "Ricardo Chaves",
-    "Jota Quest",
+    "Saulo",
   ];
 
   return (
