@@ -4,7 +4,7 @@ import { Hero } from './components/Hero';
 import { Project } from './components/Project';
 import { Goals } from './components/Goals';
 import { Gallery } from './components/Gallery';
-import { Testimonials } from './components/Testimonials';
+
 import { Vencedores } from './components/Vencedores';
 import { Join } from './components/Join';
 import { Footer } from './components/Footer';
@@ -19,7 +19,6 @@ export default function App() {
         <Goals />
         <Vencedores />
         <Gallery />
-        <Testimonials />
         <Join />
       </main>
       <Footer />
