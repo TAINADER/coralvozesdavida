@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Music, MapPin, Users, Heart, Megaphone, Sparkles, Mic2 } from 'lucide-react';
+import { MapPin, Users, Heart, Megaphone, Sparkles, Mic2 } from 'lucide-react';
 
 const WA_NUMBER = "5571999123302";
 
@@ -49,11 +49,6 @@ function ContactCard({ color, icon, title, description, message, emailSubject, t
 
 export function Goals() {
   const goals = [
-    {
-      icon: <Music size={24} />,
-      title: "20 ensaios no novo ciclo",
-      text: "Realizar 20 ensaios no novo ciclo anual de atividades, com dedicação, leveza e muita música."
-    },
     {
       icon: <MapPin size={24} />,
       title: "Apresentações públicas",
