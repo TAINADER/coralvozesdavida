@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Star, PlayCircle } from 'lucide-react';
 
-import shoppingImg from '@assets/gallery_shopping_victoria.jpg';
+
 import casaRosaImg from '@assets/gallery_casa_rosa.jpg';
 import tcaImg from '@assets/gallery_tca.jpg';
 import hospitalImg from '@assets/gallery_hospital.jpg';
@@ -14,7 +14,7 @@ export function Gallery() {
   const events = [
     { title: "Natal do Bem", venue: "Concha Acústica", date: "2025", img: natalBemImg, link: "https://www.youtube.com/live/B0n2i5H91NQ?si=LuPh4SMSMY4WX3jS" },
     { title: "Pipoca de Saulo na Concha Acústica", venue: "TCA (Teatro Castro Alves)", date: "2024", img: tcaImg, link: "https://www.youtube.com/live/bRflVlsyHdU?si=mqO18X4_ok_zPM-L" },
-    { title: "Apresentação de Natal", venue: "Shopping Vitória Boulevard", date: "2024", img: shoppingImg },
+
     { title: "Concerto Beneficente", venue: "Casa Rosa", date: "2024", img: casaRosaImg },
     { title: "Homenagem aos Pacientes", venue: "Hospital Martagão Gesteira", date: "2024", img: hospitalImg },
     { title: "Jantar do Bem", venue: "Pupileira", date: "2024", img: jantarImg },
